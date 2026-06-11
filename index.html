@@ -2,7 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#c9a227">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Koushik FIFA">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+  <meta name="description" content="FIFA World Cup 2026 full schedule in Indian Standard Time. All 104 matches, groups, knockout stage.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FIFA World Cup 2026 — Full Schedule (IST)</title>
 <style>
   :root{--gold:#c9a227;--bg:#0a0e1a;--bg2:#0d1b2a;--border:#1e293b;--text:#e2e8f0;--muted:#64748b;--dim:#334155;}
@@ -370,6 +382,48 @@ function showTab(tab,btn){
 }
 
 buildGS();gsRender();buildKO();koRender();renderGroups();
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('[PWA] Service Worker registered:', r.scope))
+      .catch(e => console.log('[PWA] SW failed:', e));
+  });
+}
+</script>
+
+<div id="install-banner" style="display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:999;background:linear-gradient(135deg,#1a2a1a,#0f1f0f);border:1px solid #c9a227;border-radius:12px;padding:12px 18px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.5);max-width:320px;width:90%">
+  <div style="font-family:Arial,sans-serif;font-size:11px;color:#c9a227;letter-spacing:1px;margin-bottom:6px">📱 INSTALL KOUSHIK FIFA SCHEDULE</div>
+  <div style="font-family:Arial,sans-serif;font-size:12px;color:#e2e8f0;margin-bottom:10px">Add Koushik FIFA Schedule to your home screen for offline access!</div>
+  <div style="display:flex;gap:8px;justify-content:center">
+    <button id="install-btn" style="padding:7px 16px;border-radius:8px;border:none;background:#c9a227;color:#0a0e1a;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;cursor:pointer">Install</button>
+    <button onclick="document.getElementById('install-banner').style.display='none'" style="padding:7px 14px;border-radius:8px;border:1px solid #334155;background:transparent;color:#64748b;font-family:Arial,sans-serif;font-size:11px;cursor:pointer">Later</button>
+  </div>
+</div>
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => {
+    document.getElementById('install-banner').style.display = 'block';
+  }, 3000);
+});
+document.getElementById('install-btn')?.addEventListener('click', async () => {
+  document.getElementById('install-banner').style.display = 'none';
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const {outcome} = await deferredPrompt.userChoice;
+    console.log('[PWA] Install outcome:', outcome);
+    deferredPrompt = null;
+  }
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+  console.log('[PWA] App installed!');
+});
 </script>
 </body>
 </html>
