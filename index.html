@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Koushik FIFA Schedule 2026</title>
-<!-- PWA -->
 <link rel="manifest" href="/Fifa-WC-2026-IST/manifest.json">
 <meta name="theme-color" content="#c9a227">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,12 +11,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Koushik FIFA">
 <link rel="apple-touch-icon" href="/Fifa-WC-2026-IST/icon-192.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/Fifa-WC-2026-IST/icon-152.png">
-<link rel="apple-touch-icon" sizes="192x192" href="/Fifa-WC-2026-IST/icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="/Fifa-WC-2026-IST/icon-512.png">
-<meta name="description" content="Koushik FIFA Schedule — FIFA World Cup 2026 full schedule in Indian Standard Time.">
+<meta name="description" content="Koushik FIFA Schedule — FIFA World Cup 2026 live scores and schedule in IST.">
 <style>
-:root{--gold:#c9a227;--bg:#0a0e1a;--bg2:#0d1b2a;--border:#1e293b;--muted:#64748b;--dim:#334155;}
+:root{--gold:#c9a227;--bg:#0a0e1a;--border:#1e293b;--muted:#64748b;--dim:#334155;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-height:100vh;color:#e2e8f0;font-family:Georgia,'Times New Roman',serif;padding-bottom:40px;}
 .header{background:rgba(10,14,26,0.97);border-bottom:2px solid var(--gold);padding:18px 14px 12px;text-align:center;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px);}
@@ -35,25 +31,33 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
 .filter-label:first-child{margin-top:0;}
 .date-scroll{display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .date-scroll::-webkit-scrollbar{display:none;}
-.date-pill{padding:4px 11px;border-radius:14px;border:1px solid var(--border);background:transparent;color:#475569;font-family:Arial,sans-serif;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.date-pill{padding:4px 11px;border-radius:14px;border:1px solid var(--border);background:transparent;color:#475569;font-family:Arial,sans-serif;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
 .date-pill.active{border-color:var(--gold);background:rgba(201,162,39,0.2);color:var(--gold);font-weight:bold;}
 .filter-row{display:flex;flex-wrap:wrap;gap:5px;}
-.fbtn{padding:3px 10px;border-radius:14px;border:1px solid var(--border);background:transparent;color:#475569;font-family:Arial,sans-serif;font-size:10px;cursor:pointer;white-space:nowrap;}
-.match-count{font-family:Arial,sans-serif;font-size:11px;color:var(--muted);margin:0 0 10px;}
+.fbtn{padding:3px 10px;border-radius:14px;border:1px solid var(--border);background:transparent;color:#475569;font-family:Arial,sans-serif;font-size:10px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.match-count{font-family:Arial,sans-serif;font-size:11px;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px;}
+.live-indicator{display:inline-flex;align-items:center;gap:4px;font-family:Arial,sans-serif;font-size:10px;color:#22c55e;font-weight:bold;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .matches-list{display:flex;flex-direction:column;gap:8px;}
-.match-card{border-radius:10px;overflow:hidden;display:flex;align-items:stretch;}
+.match-card{border-radius:10px;overflow:hidden;display:flex;align-items:stretch;position:relative;}
 .card-accent{width:4px;flex-shrink:0;}
 .card-body{padding:10px 12px;flex:1;}
 .card-badges{display:flex;align-items:center;gap:5px;margin-bottom:7px;flex-wrap:wrap;}
 .badge{padding:2px 7px;border-radius:8px;font-size:9px;font-family:Arial,sans-serif;font-weight:bold;}
+.live-badge{padding:2px 7px;border-radius:8px;font-size:9px;font-family:Arial,sans-serif;font-weight:bold;background:#dc2626;color:#fff;animation:pulse 1.5s infinite;}
 .card-date{margin-left:auto;font-size:10px;color:var(--muted);font-family:Arial,sans-serif;}
 .card-teams{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
 .team-name{flex:1;font-size:13px;font-weight:bold;}
 .team-name.right{text-align:right;}
+.score-box{padding:4px 12px;border-radius:8px;background:rgba(255,255,255,0.08);font-size:16px;font-weight:900;color:#fff;font-family:Arial,sans-serif;flex-shrink:0;min-width:52px;text-align:center;letter-spacing:2px;}
+.score-box.live{background:rgba(220,38,38,0.2);border:1px solid #dc2626;color:#fca5a5;}
+.score-box.ft{background:rgba(34,197,94,0.15);border:1px solid #22c55e33;color:#86efac;}
 .vs-badge{padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.05);font-size:10px;color:#475569;font-family:Arial,sans-serif;font-weight:bold;flex-shrink:0;}
 .card-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}
 .ist-time{font-size:13px;font-weight:900;font-family:Arial,sans-serif;}
 .venue{font-size:10px;color:var(--muted);font-family:Arial,sans-serif;}
+.match-status{font-size:10px;font-family:Arial,sans-serif;font-weight:bold;}
 .dgl{font-family:Arial,sans-serif;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;padding:8px 0 5px;border-bottom:1px solid rgba(201,162,39,0.25);margin-bottom:8px;margin-top:16px;font-weight:bold;}
 .dgl:first-child{margin-top:0;}
 .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;}
@@ -72,17 +76,19 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
 .legend-desc{font-family:Arial,sans-serif;font-size:10px;color:#475569;}
 .footer-note{margin-top:16px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);}
 .footer-note p{font-family:Arial,sans-serif;font-size:9px;color:#475569;line-height:1.6;}
-/* Install Banner */
+.refresh-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.06);}
+.refresh-btn{padding:4px 12px;border-radius:8px;border:1px solid #c9a227;background:rgba(201,162,39,0.1);color:#c9a227;font-family:Arial,sans-serif;font-size:10px;cursor:pointer;font-weight:bold;}
+.refresh-info{font-family:Arial,sans-serif;font-size:10px;color:var(--muted);}
 #install-banner{display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:999;background:linear-gradient(135deg,#1a2a1a,#0f1f0f);border:1px solid #c9a227;border-radius:12px;padding:12px 18px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.6);max-width:320px;width:90%;}
-@media(max-width:480px){.team-name{font-size:11px}.ist-time{font-size:12px}}
+@media(max-width:480px){.team-name{font-size:11px}.ist-time{font-size:12px}.score-box{font-size:14px;min-width:44px;}}
 </style>
 </head>
 <body>
 <div class="header">
   <div class="header-sub">⚽ Koushik FIFA Schedule ⚽</div>
   <h1>FIFA WORLD CUP 2026</h1>
-  <div class="header-info">🇺🇸 USA · 🇨🇦 Canada · 🇲🇽 Mexico &nbsp;|&nbsp; 48 Teams · 104 Matches · Jun 11 – Jul 19, 2026</div>
-  <div class="header-ist">All Times in IST (Indian Standard Time)</div>
+  <div class="header-info">🇺🇸 USA · 🇨🇦 Canada · 🇲🇽 Mexico &nbsp;|&nbsp; 48 Teams · 104 Matches</div>
+  <div class="header-ist">All Times in IST · Live Scores Enabled 🔴</div>
   <div class="tabs">
     <button class="tab-btn active" onclick="showTab('schedule',this)">📅 Group Stage</button>
     <button class="tab-btn" onclick="showTab('knockout',this)">🏆 Knockout</button>
@@ -91,6 +97,10 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
 </div>
 
 <div id="tab-schedule" class="tab-content active">
+  <div class="refresh-bar">
+    <div class="refresh-info" id="last-updated">Scores update every 60 seconds</div>
+    <button class="refresh-btn" onclick="fetchLiveScores()">🔄 Refresh</button>
+  </div>
   <div class="filter-section">
     <div class="filter-label">📅 FILTER BY DATE (IST)</div>
     <div class="date-scroll" id="gs-date-filters"></div>
@@ -99,7 +109,7 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
   </div>
   <div class="match-count" id="gs-count"></div>
   <div class="matches-list" id="gs-list"></div>
-  <div class="footer-note"><p>All 72 times verified. IST = ET + 9h 30min. Broadcast: JioCinema (free) / Sports18 / DD Sports.</p></div>
+  <div class="footer-note"><p>All 72 times verified. IST = ET + 9h 30min. Live scores via Free API Live Football Data. Broadcast: JioCinema / Sports18 / DD Sports.</p></div>
 </div>
 
 <div id="tab-knockout" class="tab-content">
@@ -111,7 +121,7 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
   </div>
   <div class="match-count" id="ko-count"></div>
   <div class="matches-list" id="ko-list"></div>
-  <div class="footer-note"><p>Opponents TBD after group stage. Dates, venues & IST times fixed by FIFA.</p></div>
+  <div class="footer-note"><p>Opponents TBD after group stage. Dates & venues fixed by FIFA.</p></div>
 </div>
 
 <div id="tab-groups" class="tab-content">
@@ -127,10 +137,9 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
   </div>
 </div>
 
-<!-- Install Banner -->
 <div id="install-banner">
   <div style="font-family:Arial,sans-serif;font-size:11px;color:#c9a227;letter-spacing:1px;margin-bottom:6px">📱 INSTALL KOUSHIK FIFA SCHEDULE</div>
-  <div style="font-family:Arial,sans-serif;font-size:12px;color:#e2e8f0;margin-bottom:10px">Add to your home screen for offline access!</div>
+  <div style="font-family:Arial,sans-serif;font-size:12px;color:#e2e8f0;margin-bottom:10px">Add to home screen for offline + live scores!</div>
   <div style="display:flex;gap:8px;justify-content:center">
     <button id="install-btn" style="padding:7px 16px;border-radius:8px;border:none;background:#c9a227;color:#0a0e1a;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;cursor:pointer">⚽ Install</button>
     <button onclick="document.getElementById('install-banner').style.display='none'" style="padding:7px 14px;border-radius:8px;border:1px solid #334155;background:transparent;color:#64748b;font-family:Arial,sans-serif;font-size:11px;cursor:pointer">Later</button>
@@ -138,10 +147,68 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
 </div>
 
 <script>
+// ── CONFIG ──
+const API_KEY  = '9d1b65a5bfmsh71480149ce4fb1ap1e168djsnbb143c7042b5';
+const API_HOST = 'free-api-live-football-data.p.rapidapi.com';
+const WC2026_ID = 1165; // FIFA World Cup 2026 competition ID
+
+// ── LIVE SCORE STORE ──
+// Key: "Team1 vs Team2" normalized, Value: {home, away, status, minute}
+const liveScores = {};
+
+// ── FETCH LIVE SCORES ──
+async function fetchLiveScores() {
+  try {
+    document.getElementById('last-updated').textContent = 'Fetching scores...';
+    const res = await fetch(
+      `https://${API_HOST}/football-live-matches-by-competition?compId=${WC2026_ID}`,
+      { headers: { 'x-rapidapi-key': API_KEY, 'x-rapidapi-host': API_HOST } }
+    );
+    const data = await res.json();
+    const matches = data?.response || data?.matches || data?.data || [];
+    if (Array.isArray(matches)) {
+      matches.forEach(m => {
+        const home = m?.homeTeam?.name || m?.home?.name || m?.teams?.home?.name || '';
+        const away = m?.awayTeam?.name || m?.away?.name || m?.teams?.away?.name || '';
+        const homeScore = m?.score?.home ?? m?.goals?.home ?? m?.homeGoals ?? null;
+        const awayScore = m?.score?.away ?? m?.goals?.away ?? m?.awayGoals ?? null;
+        const status = m?.status?.short || m?.status || m?.matchStatus || '';
+        const minute = m?.status?.elapsed || m?.minute || m?.time?.elapsed || null;
+        if (home && away && homeScore !== null) {
+          const key = normalizeKey(home, away);
+          liveScores[key] = { home: homeScore, away: awayScore, status, minute };
+        }
+      });
+    }
+    const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+    document.getElementById('last-updated').textContent = `Last updated: ${now} IST`;
+    gsR(); koR();
+  } catch(e) {
+    console.error('[Live] Fetch failed:', e);
+    document.getElementById('last-updated').textContent = 'Live update failed — showing schedule';
+  }
+}
+
+function normalizeKey(t1, t2) {
+  return [t1,t2].map(t=>t.toLowerCase().replace(/[^a-z]/g,'')).sort().join('|');
+}
+
+function getScore(t1, t2) {
+  // Try direct match key
+  const key = normalizeKey(t1.replace(/🇲🇽|🇰🇷|🇿🇦|🇨🇿|🇨🇦|🇨🇭|🇶🇦|🇧🇦|🇧🇷|🇲🇦|🏴󠁧󠁢󠁳󠁣󠁴󠁿|🇭🇹|🇺🇸|🇦🇺|🇵🇾|🇹🇷|🇩🇪|🇨🇼|🇨🇮|🇪🇨|🇳🇱|🇯🇵|🇸🇪|🇹🇳|🇧🇪|🇮🇷|🇪🇬|🇳🇿|🇪🇸|🇺🇾|🇸🇦|🇨🇻|🇫🇷|🇸🇳|🇳🇴|🇮🇶|🇦🇷|🇦🇹|🇩🇿|🇯🇴|🇵🇹|🇨🇴|🇺🇿|🇨🇩|🏴󠁧󠁢󠁥󠁮󠁧󠁿|🇭🇷|🇵🇦|🇬🇭/gu,'').trim(),
+    t2.replace(/🇲🇽|🇰🇷|🇿🇦|🇨🇿|🇨🇦|🇨🇭|🇶🇦|🇧🇦|🇧🇷|🇲🇦|🏴󠁧󠁢󠁳󠁣󠁴󠁿|🇭🇹|🇺🇸|🇦🇺|🇵🇾|🇹🇷|🇩🇪|🇨🇼|🇨🇮|🇪🇨|🇳🇱|🇯🇵|🇸🇪|🇹🇳|🇧🇪|🇮🇷|🇪🇬|🇳🇿|🇪🇸|🇺🇾|🇸🇦|🇨🇻|🇫🇷|🇸🇳|🇳🇴|🇮🇶|🇦🇷|🇦🇹|🇩🇿|🇯🇴|🇵🇹|🇨🇴|🇺🇿|🇨🇩|🏴󠁧󠁢󠁥󠁮󠁧󠁿|🇭🇷|🇵🇦|🇬🇭/gu,'').trim());
+  return liveScores[key] || null;
+}
+
+function isLive(status){return ['1H','2H','HT','ET','PEN','LIVE','IN_PLAY','inprogress'].includes(status);}
+function isFT(status){return ['FT','AET','PEN','FINISHED','finished','ft'].includes(status);}
+
+// ── DATA ──
 const GC={A:{t:["🇲🇽 Mexico","🇰🇷 South Korea","🇿🇦 South Africa","🇨🇿 Czechia"],c:"#e74c3c"},B:{t:["🇨🇦 Canada","🇨🇭 Switzerland","🇶🇦 Qatar","🇧🇦 Bosnia & Herz."],c:"#e67e22"},C:{t:["🇧🇷 Brazil","🇲🇦 Morocco","🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland","🇭🇹 Haiti"],c:"#f1c40f"},D:{t:["🇺🇸 USA","🇦🇺 Australia","🇵🇾 Paraguay","🇹🇷 Türkiye"],c:"#2ecc71"},E:{t:["🇩🇪 Germany","🇪🇨 Ecuador","🇨🇮 Ivory Coast","🇨🇼 Curaçao"],c:"#1abc9c"},F:{t:["🇳🇱 Netherlands","🇯🇵 Japan","🇹🇳 Tunisia","🇸🇪 Sweden"],c:"#3498db"},G:{t:["🇧🇪 Belgium","🇮🇷 Iran","🇪🇬 Egypt","🇳🇿 New Zealand"],c:"#9b59b6"},H:{t:["🇪🇸 Spain","🇺🇾 Uruguay","🇸🇦 Saudi Arabia","🇨🇻 Cape Verde"],c:"#e91e63"},I:{t:["🇫🇷 France","🇸🇳 Senegal","🇳🇴 Norway","🇮🇶 Iraq"],c:"#00bcd4"},J:{t:["🇦🇷 Argentina","🇦🇹 Austria","🇩🇿 Algeria","🇯🇴 Jordan"],c:"#ff5722"},K:{t:["🇵🇹 Portugal","🇨🇴 Colombia","🇺🇿 Uzbekistan","🇨🇩 DR Congo"],c:"#8bc34a"},L:{t:["🏴󠁧󠁢󠁥󠁮󠁧󠁿 England","🇭🇷 Croatia","🇵🇦 Panama","🇬🇭 Ghana"],c:"#ff9800"}};
 const SB={Group:"#3b82f6",R32:"#10b981",R16:"#8b5cf6",QF:"#f59e0b",SF:"#ef4444","3RD":"#6b7280",FINAL:"#fbbf24"};
 const BG={Group:"#0f1e35",R32:"#0b2a1e",R16:"#1a1030",QF:"#2a1208",SF:"#2a2000","3RD":"#141f14",FINAL:"#2a0000"};
 const SL={Group:"GROUP STAGE",R32:"ROUND OF 32",R16:"ROUND OF 16",QF:"QUARTER-FINAL",SF:"SEMI-FINAL","3RD":"3RD PLACE",FINAL:"🏆 FINAL"};
+
 const GM=[
   {d:"Fri 12 Jun",k:"12 Jun",i:"12:30 AM IST",g:"A",t1:"🇲🇽 Mexico",t2:"🇿🇦 South Africa",v:"Azteca, Mexico City",s:"Group"},
   {d:"Fri 12 Jun",k:"12 Jun",i:"7:30 AM IST",g:"A",t1:"🇰🇷 South Korea",t2:"🇨🇿 Czechia",v:"Akron, Guadalajara",s:"Group"},
@@ -216,6 +283,7 @@ const GM=[
   {d:"Sun 28 Jun",k:"28 Jun",i:"7:30 AM IST",g:"J",t1:"🇩🇿 Algeria",t2:"🇦🇹 Austria",v:"Arrowhead, Kansas City",s:"Group"},
   {d:"Sun 28 Jun",k:"28 Jun",i:"7:30 AM IST",g:"J",t1:"🇯🇴 Jordan",t2:"🇦🇷 Argentina",v:"AT&T Stadium, Dallas",s:"Group"},
 ];
+
 const KM=[
   {d:"Sun 29 Jun",k:"29 Jun",i:"12:30 AM IST",t1:"R32 Match 1",t2:"TBD",v:"SoFi Stadium, LA",s:"R32"},
   {d:"Sun 29 Jun",k:"29 Jun",i:"10:30 PM IST",t1:"R32 Match 2",t2:"TBD",v:"NRG Stadium, Houston",s:"R32"},
@@ -250,41 +318,62 @@ const KM=[
   {d:"Sat 19 Jul",k:"19 Jul",i:"12:30 AM IST",t1:"3rd Place Play-Off",t2:"TBD",v:"Hard Rock, Miami",s:"3RD"},
   {d:"Sun 20 Jul",k:"20 Jul",i:"12:30 AM IST",t1:"🏆 THE FINAL",t2:"TBD",v:"MetLife Stadium, New York/NJ",s:"FINAL"},
 ];
+
 function tc(i){
   if(i.includes("9:30 PM")||i.includes("10:30 PM")||i.includes("11:30 PM"))return "#22c55e";
   if(i.includes("12:30 AM"))return "#facc15";
   if(i.match(/^[123]:/)||i.includes("2:00 AM"))return "#fb923c";
   return "#f87171";
 }
+
 function card(m){
   const gc=m.g?(GC[m.g]||{}).c||"#334155":SB[m.s]||"#334155";
   const col=tc(m.i);
-  return `<div class="match-card" style="background:linear-gradient(135deg,${BG[m.s]||"#0f1e35"} 0%,#0f172a 100%);border:1px solid ${gc}33">
-    <div class="card-accent" style="background:${gc}"></div>
+  const score=getScore(m.t1,m.t2);
+  const live=score&&isLive(score.status);
+  const ft=score&&isFT(score.status);
+  let scoreHTML='<div class="vs-badge">VS</div>';
+  if(score&&score.home!==null){
+    const cls=live?'live':ft?'ft':'';
+    scoreHTML=`<div class="score-box ${cls}">${score.home} – ${score.away}</div>`;
+  }
+  let statusHTML='';
+  if(live) statusHTML=`<span class="match-status" style="color:#f87171">🔴 LIVE${score.minute?' '+score.minute+"'":''}</span>`;
+  else if(ft) statusHTML=`<span class="match-status" style="color:#22c55e">✅ FT</span>`;
+  return `<div class="match-card" style="background:linear-gradient(135deg,${BG[m.s]||"#0f1e35"} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
+    <div class="card-accent" style="background:${live?'#dc2626':gc}"></div>
     <div class="card-body">
       <div class="card-badges">
         ${m.g?`<span class="badge" style="background:${gc}33;color:${gc}">GRP ${m.g}</span>`:''}
-        <span class="badge" style="background:${SB[m.s]}22;color:${SB[m.s]}">${SL[m.s]||m.s}</span>
+        ${live?'<span class="live-badge">🔴 LIVE</span>':`<span class="badge" style="background:${SB[m.s]}22;color:${SB[m.s]}">${SL[m.s]||m.s}</span>`}
         <span class="card-date">📅 ${m.d}</span>
       </div>
       <div class="card-teams">
         <div class="team-name right">${m.t1}</div>
-        <div class="vs-badge">VS</div>
+        ${scoreHTML}
         <div class="team-name">${m.t2}</div>
       </div>
       <div class="card-footer">
         <div class="ist-time" style="color:${col}">🕐 ${m.i}</div>
-        <div class="venue">📍 ${m.v}</div>
+        ${statusHTML||`<div class="venue">📍 ${m.v}</div>`}
       </div>
+      ${statusHTML&&!live?`<div style="font-family:Arial,sans-serif;font-size:10px;color:var(--muted);margin-top:4px">📍 ${m.v}</div>`:''}
     </div>
   </div>`;
 }
+
 function renderList(list,cId,lId){
   const bd={};list.forEach(m=>{if(!bd[m.d])bd[m.d]=[];bd[m.d].push(m);});
-  let h="";Object.entries(bd).forEach(([date,ms])=>{h+=`<div class="dgl">📅 ${date} — ${ms.length} match${ms.length>1?"es":""}</div>`;ms.forEach(m=>{h+=card(m);});});
+  let h="";
+  Object.entries(bd).forEach(([date,ms])=>{
+    const hasLive=ms.some(m=>{const sc=getScore(m.t1,m.t2);return sc&&isLive(sc.status);});
+    h+=`<div class="dgl">📅 ${date} — ${ms.length} match${ms.length>1?"es":""}${hasLive?' <span class="live-indicator"><span class="live-dot"></span>LIVE</span>':''}</div>`;
+    ms.forEach(m=>{h+=card(m);});
+  });
   document.getElementById(lId).innerHTML=h||'<div style="text-align:center;padding:30px;color:#475569;font-family:Arial,sans-serif">No matches.</div>';
-  document.getElementById(cId).textContent=`Showing ${list.length} matches`;
+  document.getElementById(cId).innerHTML=`Showing ${list.length} matches`;
 }
+
 let gsd="ALL",gsg="ALL";
 function buildGS(){
   const dates=[...new Set(GM.map(m=>m.k))];
@@ -298,6 +387,7 @@ function buildGS(){
 function gsR(){renderList(GM.filter(m=>(gsd==="ALL"||m.k===gsd)&&(gsg==="ALL"||m.g===gsg)),"gs-count","gs-list");}
 function gsDt(d,b){gsd=d;document.querySelectorAll("#gs-date-filters .date-pill").forEach(x=>x.classList.remove("active"));b.classList.add("active");gsR();}
 function gsGp(g,b){gsg=g;document.querySelectorAll("#gs-group-filters .fbtn").forEach(x=>{x.classList.remove("active");x.style.cssText="";});b.classList.add("active");if(g!=="ALL"){const c=GC[g]?.c;b.style.borderColor=c;b.style.background=c+"33";b.style.color=c;b.style.fontWeight="bold";}gsR();}
+
 let kod="ALL",kor="ALL";
 const ROUNDS=["R32","R16","QF","SF","3RD","FINAL"];
 const RL={"R32":"Round of 32","R16":"Round of 16","QF":"Quarter-Finals","SF":"Semi-Finals","3RD":"3rd Place","FINAL":"🏆 Final"};
@@ -313,16 +403,30 @@ function buildKO(){
 function koR(){renderList(KM.filter(m=>(kod==="ALL"||m.k===kod)&&(kor==="ALL"||m.s===kor)),"ko-count","ko-list");}
 function koDt(d,b){kod=d;document.querySelectorAll("#ko-date-filters .date-pill").forEach(x=>x.classList.remove("active"));b.classList.add("active");koR();}
 function koRd(r,b){kor=r;document.querySelectorAll("#ko-round-filters .fbtn").forEach(x=>{x.classList.remove("active");x.style.cssText="";});b.classList.add("active");if(r!=="ALL"){const c=SB[r];b.style.borderColor=c;b.style.background=c+"22";b.style.color=c;b.style.fontWeight="bold";}koR();}
+
 function renderGroups(){
-  let h="";Object.entries(GC).forEach(([g,d])=>{h+=`<div class="group-card" style="background:linear-gradient(135deg,#111827,#0f172a);border:1px solid ${d.c}44"><div class="group-header" style="background:linear-gradient(135deg,${d.c}cc,${d.c}66)"><div class="group-letter">${g}</div><div class="group-label">GROUP ${g}</div></div><div class="group-teams">${d.t.map((t,i)=>`<div class="group-team" style="${i<3?"border-bottom:1px solid rgba(255,255,255,0.07)":""}"><span class="team-num" style="background:${d.c}33;color:${d.c}">${i+1}</span>${t}</div>`).join("")}</div></div>`;});
+  let h="";
+  Object.entries(GC).forEach(([g,d])=>{
+    h+=`<div class="group-card" style="background:linear-gradient(135deg,#111827,#0f172a);border:1px solid ${d.c}44">
+      <div class="group-header" style="background:linear-gradient(135deg,${d.c}cc,${d.c}66)">
+        <div class="group-letter">${g}</div><div class="group-label">GROUP ${g}</div>
+      </div>
+      <div class="group-teams">${d.t.map((t,i)=>`<div class="group-team" style="${i<3?"border-bottom:1px solid rgba(255,255,255,0.07)":""}"><span class="team-num" style="background:${d.c}33;color:${d.c}">${i+1}</span>${t}</div>`).join("")}</div>
+    </div>`;
+  });
   document.getElementById("groups-grid").innerHTML=h;
 }
+
 function showTab(tab,btn){
   document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   document.getElementById("tab-"+tab).classList.add("active");btn.classList.add("active");
 }
+
+// INIT
 buildGS();gsR();buildKO();koR();renderGroups();
+fetchLiveScores();
+setInterval(fetchLiveScores, 60000); // refresh every 60 seconds
 
 // PWA Install
 let deferredPrompt;
@@ -335,14 +439,12 @@ document.getElementById('install-btn').addEventListener('click',async()=>{
   if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;}
 });
 window.addEventListener('appinstalled',()=>{document.getElementById('install-banner').style.display='none';});
-</script>
 
-<!-- Service Worker -->
-<script>
+// Service Worker
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('/Fifa-WC-2026-IST/sw.js')
-      .then(r=>console.log('[PWA] SW registered:',r.scope))
+      .then(r=>console.log('[PWA] SW registered'))
       .catch(e=>console.error('[PWA] SW error:',e));
   });
 }
