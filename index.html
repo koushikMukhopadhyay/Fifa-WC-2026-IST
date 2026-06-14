@@ -308,25 +308,18 @@ const KM=[
 // ══════════════════════════════════════
 // SCORE STORE — keyed by "team1|team2" (sorted, exact API names)
 // ══════════════════════════════════════
-const SCORES = {}; // key => {hs, as, status}
-
-// PRE-POPULATED from openfootball API (updated at build time)
-// These show instantly without needing a fetch
-(function preload() {
-  const known = [
-    {t1:"Mexico",t2:"South Africa",hs:2,as:0},
-    {t1:"South Korea",t2:"Czech Republic",hs:2,as:1},
-    {t1:"Canada",t2:"Bosnia & Herzegovina",hs:1,as:1},
-    {t1:"Qatar",t2:"Switzerland",hs:1,as:1},
-    {t1:"Brazil",t2:"Morocco",hs:1,as:1},
-    {t1:"Haiti",t2:"Scotland",hs:0,as:1},
-    {t1:"USA",t2:"Paraguay",hs:4,as:1},
-    {t1:"Australia",t2:"Turkey",hs:2,as:0},
-  ];
-  known.forEach(r => {
-    SCORES[mkey(r.t1, r.t2)] = {hs: r.hs, as: r.as, status: 'FT'};
-  });
-})();
+// SCORES — keyed by sorted team names joined with |||
+// Pre-populated with exact keys (no runtime matching needed)
+const SCORES = {
+  'Mexico|||South Africa':              {hs:2,as:0,status:'FT'},
+  'Czech Republic|||South Korea':       {hs:2,as:1,status:'FT'},
+  'Bosnia & Herzegovina|||Canada':      {hs:1,as:1,status:'FT'},
+  'Qatar|||Switzerland':                {hs:1,as:1,status:'FT'},
+  'Brazil|||Morocco':                   {hs:1,as:1,status:'FT'},
+  'Haiti|||Scotland':                   {hs:0,as:1,status:'FT'},
+  'Paraguay|||USA':                     {hs:4,as:1,status:'FT'},
+  'Australia|||Turkey':                 {hs:2,as:0,status:'FT'},
+};
 
 function mkey(t1, t2) {
   // Simple sort — exact API names only
