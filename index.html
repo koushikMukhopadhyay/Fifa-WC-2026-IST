@@ -427,8 +427,8 @@ function tc(i){
 }
 
 // ── MODAL ──
-function openModal(idx){
-  const m = ALL_MATCHES[idx];
+function openModal(mid){
+  const m = MATCH_REGISTRY[mid];
   if(!m)return;
   const sc = getScore(m);
   const ev = getEvents(m);
@@ -515,10 +515,13 @@ function closeModal(){
   document.body.style.overflow='';
 }
 
-// ── CARD RENDER ──
-let ALL_MATCHES=[];
+// ── MATCH REGISTRY (stable IDs, never overwritten) ──
+const MATCH_REGISTRY = {};
+GM.forEach((m,i) => { MATCH_REGISTRY['g_'+i] = m; });
+KM.forEach((m,i) => { MATCH_REGISTRY['k_'+i] = m; });
 
-function card(m, idx){
+// ── CARD RENDER ──
+function card(m, mid){
   const gc=m.g?(GC[m.g]||{}).c||"#334155":SB[m.s]||"#334155";
   const col=tc(m.i);
   const sc=getScore(m);
@@ -557,15 +560,21 @@ function card(m, idx){
 }
 
 // ── RENDER LIST ──
-function renderList(list,cId,lId){
-  ALL_MATCHES=list; // store globally for modal access
+// prefix: 'g' for group matches, 'k' for knockout
+function renderList(list, cId, lId, prefix){
   const bd={};
-  list.forEach((m,i)=>{if(!bd[m.d])bd[m.d]=[];bd[m.d].push({m,i});});
+  list.forEach(m=>{if(!bd[m.d])bd[m.d]=[];bd[m.d].push(m);});
   let h='';
-  Object.entries(bd).forEach(([date,items])=>{
-    const hasLive=items.some(({m})=>{const sc=getScore(m);return sc&&isLive(sc.status);});
-    h+=`<div class="dgl">${hasLive?'<span class="live-dot"></span>':''}📅 ${date} — ${items.length} match${items.length>1?'es':''}</div>`;
-    items.forEach(({m,i})=>{h+=card(m,i);});
+  Object.entries(bd).forEach(([date,ms])=>{
+    const hasLive=ms.some(m=>{const sc=getScore(m);return sc&&isLive(sc.status);});
+    h+=`<div class="dgl">${hasLive?'<span class="live-dot"></span>':''}📅 ${date} — ${ms.length} match${ms.length>1?'es':''}</div>`;
+    ms.forEach(m=>{
+      // Find stable ID from registry
+      const srcArr = prefix==='g'?GM:KM;
+      const idx = srcArr.indexOf(m);
+      const mid = prefix+'_'+idx;
+      h+=card(m, mid);
+    });
   });
   document.getElementById(lId).innerHTML=h||'<div style="text-align:center;padding:30px;color:#475569;font-family:Arial,sans-serif">No matches.</div>';
   document.getElementById(cId).textContent=`Showing ${list.length} matches`;
@@ -631,7 +640,7 @@ function buildGS(){
 }
 function gsR(){
   const list=GM.filter(m=>(gsd==='ALL'||m.k===gsd)&&(gsg==='ALL'||m.g===gsg));
-  renderList(list,'gs-count','gs-list');
+  renderList(list,'gs-count','gs-list','g');
 }
 function gsDt(d,b){gsd=d;document.querySelectorAll('#gs-date-filters .date-pill').forEach(x=>x.classList.remove('active'));b.classList.add('active');gsR();}
 function gsGp(g,b){gsg=g;document.querySelectorAll('#gs-group-filters .fbtn').forEach(x=>{x.classList.remove('active');x.style.cssText='';});b.classList.add('active');if(g!=='ALL'){const c=GC[g]?.c;b.style.borderColor=c;b.style.background=c+'33';b.style.color=c;b.style.fontWeight='bold';}gsR();}
@@ -650,7 +659,7 @@ function buildKO(){
 }
 function koR(){
   const list=KM.filter(m=>(kod==='ALL'||m.k===kod)&&(kor==='ALL'||m.s===kor));
-  renderList(list,'ko-count','ko-list');
+  renderList(list,'ko-count','ko-list','k');
 }
 function koDt(d,b){kod=d;document.querySelectorAll('#ko-date-filters .date-pill').forEach(x=>x.classList.remove('active'));b.classList.add('active');koR();}
 function koRd(r,b){kor=r;document.querySelectorAll('#ko-round-filters .fbtn').forEach(x=>{x.classList.remove('active');x.style.cssText='';});b.classList.add('active');if(r!=='ALL'){const c=SB[r];b.style.borderColor=c;b.style.background=c+'22';b.style.color=c;b.style.fontWeight='bold';}koR();}
@@ -678,6 +687,34 @@ function showTab(tab,btn){
 // ── LIVE FETCH ──
 async function doFetch(){
   document.getElementById('last-updated').textContent='🔄 Fetching live scores...';
+
+  // Try RapidAPI for LIVE minute-by-minute data first
+  try {
+    const liveRes = await fetch('https://free-api-live-football-data.p.rapidapi.com/football-live-scores', {
+      headers: {
+        'x-rapidapi-key': '9d1b65a5bfmsh71480149ce4fb1ap1e168djsnbb143c7042b5',
+        'x-rapidapi-host': 'free-api-live-football-data.p.rapidapi.com'
+      }
+    });
+    if(liveRes.ok){
+      const liveData = await liveRes.json();
+      const liveMatches = liveData?.response || liveData?.data || liveData?.matches || (Array.isArray(liveData)?liveData:[]);
+      liveMatches.forEach(m=>{
+        const t1 = m?.homeTeam?.name||m?.home?.name||m?.teams?.home?.name||'';
+        const t2 = m?.awayTeam?.name||m?.away?.name||m?.teams?.away?.name||'';
+        const hs = m?.goals?.home??m?.score?.home??null;
+        const as_ = m?.goals?.away??m?.score?.away??null;
+        const status = m?.fixture?.status?.short||m?.status?.short||m?.status||'LIVE';
+        const minute = m?.fixture?.status?.elapsed||m?.status?.elapsed||m?.minute||null;
+        if(t1&&t2&&hs!==null){
+          const k=mk(t1,t2);
+          SCORES[k]={hs,as:as_,status,minute};
+          console.log('[LIVE]',t1,hs,'-',as_,t2,'min:',minute);
+        }
+      });
+    }
+  } catch(e){ console.log('[LIVE API] failed:',e.message); }
+
   try {
     const res=await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json?t='+Date.now());
     const data=await res.json();
