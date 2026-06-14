@@ -338,6 +338,10 @@ const KM=[
   {d:"Sun 20 Jul",k:"20 Jul",i:"12:30 AM IST",t1:"🏆 THE FINAL",t2:"TBD",v:"MetLife Stadium, New York/NJ",s:"FINAL"},
 ];
 
+// ── ASSIGN STABLE IDs TO ALL MATCHES ──
+GM.forEach((m,i) => { m._id = 'g'+i; });
+KM.forEach((m,i) => { m._id = 'k'+i; });
+
 // ── SCORE STORE (hardcoded keys — exact sorted API names) ──
 const SCORES = {
   'Mexico|||South Africa':         {hs:2,as:0,status:'FT',minute:null},
@@ -427,8 +431,9 @@ function tc(i){
 }
 
 // ── MODAL ──
-function openModal(mid){
-  const m = MATCH_REGISTRY[mid];
+function openModal(id){
+  // Direct lookup: g0..g71 = group matches, k0..k31 = knockout
+  const m = id.startsWith('g') ? GM[parseInt(id.slice(1))] : KM[parseInt(id.slice(1))];
   if(!m)return;
   const sc = getScore(m);
   const ev = getEvents(m);
@@ -515,11 +520,6 @@ function closeModal(){
   document.body.style.overflow='';
 }
 
-// ── MATCH REGISTRY (stable IDs, never overwritten) ──
-const MATCH_REGISTRY = {};
-GM.forEach((m,i) => { MATCH_REGISTRY['g_'+i] = m; });
-KM.forEach((m,i) => { MATCH_REGISTRY['k_'+i] = m; });
-
 // ── CARD RENDER ──
 function card(m, mid){
   const gc=m.g?(GC[m.g]||{}).c||"#334155":SB[m.s]||"#334155";
@@ -539,7 +539,8 @@ function card(m, mid){
   } else if(ft){
     topGoal=`<div class="tap-hint">Tap for match details</div>`;
   }
-  return `<div class="match-card" onclick="openModal('${mid}')" style="background:linear-gradient(135deg,${BG[m.s]||'#0f1e35'} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
+  const stableId = m._id;
+  return `<div class="match-card" onclick="openModal('${stableId}')" style="background:linear-gradient(135deg,${BG[m.s]||'#0f1e35'} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
     <div class="card-accent" style="background:${live?'#dc2626':gc}"></div>
     <div class="card-body">
       <div class="card-badges">
@@ -561,7 +562,7 @@ function card(m, mid){
 
 // ── RENDER LIST ──
 // prefix: 'g' for group matches, 'k' for knockout
-function renderList(list, cId, lId, prefix){
+function renderList(list, cId, lId){
   const bd={};
   list.forEach(m=>{if(!bd[m.d])bd[m.d]=[];bd[m.d].push(m);});
   let h='';
@@ -569,11 +570,7 @@ function renderList(list, cId, lId, prefix){
     const hasLive=ms.some(m=>{const sc=getScore(m);return sc&&isLive(sc.status);});
     h+=`<div class="dgl">${hasLive?'<span class="live-dot"></span>':''}📅 ${date} — ${ms.length} match${ms.length>1?'es':''}</div>`;
     ms.forEach(m=>{
-      // Find stable ID from registry
-      const srcArr = prefix==='g'?GM:KM;
-      const idx = srcArr.indexOf(m);
-      const mid = prefix+'_'+idx;
-      h+=card(m, mid);
+      h+=card(m, m._id); // use stable ID from match object
     });
   });
   document.getElementById(lId).innerHTML=h||'<div style="text-align:center;padding:30px;color:#475569;font-family:Arial,sans-serif">No matches.</div>';
@@ -640,7 +637,7 @@ function buildGS(){
 }
 function gsR(){
   const list=GM.filter(m=>(gsd==='ALL'||m.k===gsd)&&(gsg==='ALL'||m.g===gsg));
-  renderList(list,'gs-count','gs-list','g');
+  renderList(list,'gs-count','gs-list');
 }
 function gsDt(d,b){gsd=d;document.querySelectorAll('#gs-date-filters .date-pill').forEach(x=>x.classList.remove('active'));b.classList.add('active');gsR();}
 function gsGp(g,b){gsg=g;document.querySelectorAll('#gs-group-filters .fbtn').forEach(x=>{x.classList.remove('active');x.style.cssText='';});b.classList.add('active');if(g!=='ALL'){const c=GC[g]?.c;b.style.borderColor=c;b.style.background=c+'33';b.style.color=c;b.style.fontWeight='bold';}gsR();}
@@ -659,7 +656,7 @@ function buildKO(){
 }
 function koR(){
   const list=KM.filter(m=>(kod==='ALL'||m.k===kod)&&(kor==='ALL'||m.s===kor));
-  renderList(list,'ko-count','ko-list','k');
+  renderList(list,'ko-count','ko-list');
 }
 function koDt(d,b){kod=d;document.querySelectorAll('#ko-date-filters .date-pill').forEach(x=>x.classList.remove('active'));b.classList.add('active');koR();}
 function koRd(r,b){kor=r;document.querySelectorAll('#ko-round-filters .fbtn').forEach(x=>{x.classList.remove('active');x.style.cssText='';});b.classList.add('active');if(r!=='ALL'){const c=SB[r];b.style.borderColor=c;b.style.background=c+'22';b.style.color=c;b.style.fontWeight='bold';}koR();}
