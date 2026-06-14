@@ -149,8 +149,8 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
 <script>
 // ── CONFIG ──
 const API_KEY  = '9d1b65a5bfmsh71480149ce4fb1ap1e168djsnbb143c7042b5';
-const API_HOST = 'free-api-live-football-data.p.rapidapi.com';
-const WC2026_ID = 1165; // FIFA World Cup 2026 competition ID
+const API_HOST = 'api-football-v1.p.rapidapi.com';
+const WC2026_ID = 1; // FIFA World Cup 2026 league ID in api-football
 
 // ── LIVE SCORE STORE ──
 // Key: "Team1 vs Team2" normalized, Value: {home, away, status, minute}
@@ -158,35 +158,70 @@ const liveScores = {};
 
 // ── FETCH LIVE SCORES ──
 async function fetchLiveScores() {
+  document.getElementById('last-updated').textContent = '🔄 Fetching scores...';
+  let found = 0;
+
   try {
-    document.getElementById('last-updated').textContent = 'Fetching scores...';
-    const res = await fetch(
-      `https://${API_HOST}/football-live-matches-by-competition?compId=${WC2026_ID}`,
-      { headers: { 'x-rapidapi-key': API_KEY, 'x-rapidapi-host': API_HOST } }
-    );
-    const data = await res.json();
-    const matches = data?.response || data?.matches || data?.data || [];
-    if (Array.isArray(matches)) {
-      matches.forEach(m => {
-        const home = m?.homeTeam?.name || m?.home?.name || m?.teams?.home?.name || '';
-        const away = m?.awayTeam?.name || m?.away?.name || m?.teams?.away?.name || '';
-        const homeScore = m?.score?.home ?? m?.goals?.home ?? m?.homeGoals ?? null;
-        const awayScore = m?.score?.away ?? m?.goals?.away ?? m?.awayGoals ?? null;
-        const status = m?.status?.short || m?.status || m?.matchStatus || '';
-        const minute = m?.status?.elapsed || m?.minute || m?.time?.elapsed || null;
+    // TheSportsDB - completely free, no key, covers FIFA World Cup
+    // Get today's soccer events
+    const today = new Date().toISOString().split('T')[0];
+    const url = `https://www.thesportsdb.com/api/v2/json/livescore.php?s=Soccer`;
+    const r = await fetch(url);
+    const d = await r.json();
+    console.log('[TSDB Live]', JSON.stringify(d).substring(0,300));
+
+    const events = d?.events || d?.results || [];
+    if (Array.isArray(events)) {
+      events.forEach(e => {
+        const home = e?.strHomeTeam || e?.strTeam1 || '';
+        const away = e?.strAwayTeam || e?.strTeam2 || '';
+        const homeScore = e?.intHomeScore ?? e?.intScore1 ?? null;
+        const awayScore = e?.intAwayScore ?? e?.intScore2 ?? null;
+        const status = e?.strStatus || e?.strProgress || '';
+        const minute = e?.intProgress || null;
         if (home && away && homeScore !== null) {
-          const key = normalizeKey(home, away);
-          liveScores[key] = { home: homeScore, away: awayScore, status, minute };
+          liveScores[normalizeKey(home, away)] = {home: homeScore, away: awayScore, status, minute};
+          found++;
+          console.log('[TSDB]', home, homeScore, '-', awayScore, away, status);
         }
       });
     }
-    const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
-    document.getElementById('last-updated').textContent = `Last updated: ${now} IST`;
-    gsR(); koR();
-  } catch(e) {
-    console.error('[Live] Fetch failed:', e);
-    document.getElementById('last-updated').textContent = 'Live update failed — showing schedule';
+  } catch(e) { console.log('[TSDB] Error:', e.message); }
+
+  // Fallback: try livescore6 via RapidAPI  
+  if (found === 0) {
+    try {
+      const r = await fetch('https://livescore6.p.rapidapi.com/matches/v2/list-live?Category=soccer&Tz=5.5', {
+        headers: {'x-rapidapi-key': API_KEY, 'x-rapidapi-host': 'livescore6.p.rapidapi.com'}
+      });
+      const d = await r.json();
+      console.log('[LS6]', JSON.stringify(d).substring(0,300));
+      const stages = d?.Stages || [];
+      stages.forEach(stage => {
+        // Filter for World Cup
+        const comp = (stage?.Cnm || '') + (stage?.Snm || '');
+        if (comp.toLowerCase().includes('world') || comp.toLowerCase().includes('fifa')) {
+          (stage?.Events || []).forEach(e => {
+            const home = e?.T1?.[0]?.Nm || '';
+            const away = e?.T2?.[0]?.Nm || '';
+            const homeScore = e?.Tr1 ?? null;
+            const awayScore = e?.Tr2 ?? null;
+            const status = e?.Eps || '';
+            if (home && away && homeScore !== null) {
+              liveScores[normalizeKey(home, away)] = {home: homeScore, away: awayScore, status, minute: null};
+              found++;
+            }
+          });
+        }
+      });
+    } catch(e) { console.log('[LS6] Error:', e.message); }
   }
+
+  const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('last-updated').textContent = found > 0
+    ? `✅ ${found} live score(s) — ${now} IST`
+    : `⚠️ No live scores right now — ${now} IST`;
+  gsR(); koR();
 }
 
 function normalizeKey(t1, t2) {
