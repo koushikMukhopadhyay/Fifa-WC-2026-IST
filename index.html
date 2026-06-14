@@ -539,7 +539,7 @@ function card(m, mid){
   } else if(ft){
     topGoal=`<div class="tap-hint">Tap for match details</div>`;
   }
-  return `<div class="match-card" onclick="openModal(${idx})" style="background:linear-gradient(135deg,${BG[m.s]||'#0f1e35'} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
+  return `<div class="match-card" onclick="openModal('${mid}')" style="background:linear-gradient(135deg,${BG[m.s]||'#0f1e35'} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
     <div class="card-accent" style="background:${live?'#dc2626':gc}"></div>
     <div class="card-body">
       <div class="card-badges">
