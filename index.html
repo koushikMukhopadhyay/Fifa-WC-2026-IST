@@ -345,31 +345,49 @@ const ALIASES = {
 
 // ══════════════════════════════════════
 // LIVE SCORE STORE
+// Key = "team1|team2" always sorted alphabetically by normalized name
 // ══════════════════════════════════════
 const liveScores = {};
 
-function nk(t){return t.toLowerCase().replace(/[^a-z]/g,'');}
-function normalizeKey(a,b){return [nk(a),nk(b)].sort().join('|');}
+function nk(t){
+  // Remove emojis, flags, and normalize
+  return t.replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]/gu,'')
+          .replace(/[^a-zA-Z]/g,'').toLowerCase().trim();
+}
+function normalizeKey(a,b){
+  const na=nk(a), nb=nk(b);
+  return [na,nb].sort().join('|');
+}
+
+// Store a result — tries multiple name variants
+function storeResult(team1, team2, hs, as_, status, minute){
+  // Always store with both original and aliased names
+  const variants1 = [team1, ALIASES[team1]||team1];
+  const variants2 = [team2, ALIASES[team2]||team2];
+  variants1.forEach(t1=>{
+    variants2.forEach(t2=>{
+      const k = normalizeKey(t1,t2);
+      liveScores[k] = {home:hs, away:as_, status:status||'FT', minute:minute||null};
+    });
+  });
+}
 
 function getScore(t1,t2){
-  // Strip emoji flags from display names
-  const clean = t=>t.replace(/[\u{1F1E0}-\u{1F1FF}]{2}|\uD83C[\uDDE0-\uDDFF]{2}|[\u2600-\u27FF]|./gu, c=>{
-    return /\p{Emoji}/u.test(c) ? '' : c;
-  }).replace(/\s+/g,' ').trim();
-  const c1=clean(t1), c2=clean(t2);
-  // Try direct key
-  let key=normalizeKey(c1,c2);
+  // Try normalized key
+  const key = normalizeKey(t1,t2);
   if(liveScores[key]) return liveScores[key];
-  // Try with aliases
-  const a1=ALIASES[c1]||c1, a2=ALIASES[c2]||c2;
-  key=normalizeKey(a1,a2);
-  if(liveScores[key]) return liveScores[key];
-  // Try partial match
-  for(const k of Object.keys(liveScores)){
-    const parts=k.split('|');
-    const n1=nk(c1),n2=nk(c2);
-    if((parts[0].includes(n1)||n1.includes(parts[0]))&&(parts[1].includes(n2)||n2.includes(parts[1]))) return liveScores[k];
-    if((parts[0].includes(n2)||n2.includes(parts[0]))&&(parts[1].includes(n1)||n1.includes(parts[1]))) return liveScores[k];
+  // Try with aliases applied
+  const a1=ALIASES[t1.replace(/[^a-zA-Z ]/g,'').trim()]||t1;
+  const a2=ALIASES[t2.replace(/[^a-zA-Z ]/g,'').trim()]||t2;
+  const key2 = normalizeKey(a1,a2);
+  if(liveScores[key2]) return liveScores[key2];
+  // Fuzzy: check if any stored key is substring match
+  const n1=nk(t1), n2=nk(t2);
+  for(const [k,v] of Object.entries(liveScores)){
+    const [ka,kb]=k.split('|');
+    const match1=(ka.includes(n1)||n1.includes(ka))&&(kb.includes(n2)||n2.includes(kb));
+    const match2=(ka.includes(n2)||n2.includes(ka))&&(kb.includes(n1)||n1.includes(kb));
+    if(match1||match2) return v;
   }
   return null;
 }
@@ -394,7 +412,10 @@ function calcStandings(){
 
   // Process each group match that has a score
   GM.forEach(m=>{
-    const score = liveScores[normalizeKey(m.h,m.a)];
+    // Try all key variants for this match
+    const score = liveScores[normalizeKey(m.h,m.a)]
+      || liveScores[normalizeKey(ALIASES[m.h]||m.h, ALIASES[m.a]||m.a)]
+      || getScore(m.t1,m.t2);
     if(!score || score.home===null || score.away===null) return;
     if(!isFT(score.status) && !isLive(score.status)) return;
 
@@ -403,9 +424,14 @@ function calcStandings(){
     const grp = m.g;
 
     // Find home team in standings
+    // Find team in standings by fuzzy match
     const resolveTeam=(name)=>{
-      const n=ALIASES[name]||name;
-      return Object.keys(standings[grp]||{}).find(k=>nk(k)===nk(n)||nk(k)===nk(name)||nk(n).includes(nk(k))||nk(k).includes(nk(n)));
+      const n=nk(ALIASES[name]||name);
+      const nm=nk(name);
+      return Object.keys(standings[grp]||{}).find(k=>{
+        const kn=nk(k);
+        return kn===n||kn===nm||kn.includes(n)||n.includes(kn)||kn.includes(nm)||nm.includes(kn);
+      });
     };
     const hKey = resolveTeam(m.h);
     const aKey = resolveTeam(m.a);
@@ -497,34 +523,26 @@ async function fetchLiveScores(){
         if(h&&a&&hs!==null){liveScores[normalizeKey(h,a)]={home:hs,away:as,status:st,minute:e?.intProgress||null};found++;}
       });
     },
-    // Source 3: openfootball worldcup JSON (best free source for WC2026)
+    // Source 3: openfootball - primary source for WC2026
     async()=>{
       const r=await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json');
       const d=await r.json();
-      // API uses flat matches array
-      const matches=d?.matches||d?.rounds?.flatMap(r=>r.matches)||[];
-      console.log('[OpenFootball] total matches:',matches.length);
+      const matches=d?.matches||[];
+      console.log('[OF] total matches:',matches.length);
       matches.forEach(m=>{
-        const h=ALIASES[m?.team1]||m?.team1||'';
-        const a=ALIASES[m?.team2]||m?.team2||'';
-        const hs=m?.score?.ft?.[0]??null;
-        const as=m?.score?.ft?.[1]??null;
-        if(h&&a&&hs!==null){
-          liveScores[normalizeKey(h,a)]={home:hs,away:as,status:'FT',minute:null};
-          // Also store with original names
-          liveScores[normalizeKey(m.team1,m.team2)]={home:hs,away:as,status:'FT',minute:null};
-          found++;
-          console.log('[OF]',m.team1,hs,'-',as,m.team2);
-        }
-        // Live/in-progress
-        if(h&&a&&m?.score?.ht&&!m?.score?.ft){
-          const hs2=m?.score?.['1h']?.[0]??m?.score?.ht?.[0]??null;
-          const as2=m?.score?.['1h']?.[1]??m?.score?.ht?.[1]??null;
-          if(hs2!==null){
-            liveScores[normalizeKey(h,a)]={home:hs2,away:as2,status:'1H',minute:null};
-            found++;
-          }
-        }
+        if(!m?.score?.ft) return; // skip if no result yet
+        const hs=m.score.ft[0];
+        const as_=m.score.ft[1];
+        storeResult(m.team1, m.team2, hs, as_, 'FT', null);
+        found++;
+        console.log('[OF] Stored:',m.team1,hs,'-',as_,m.team2,'key:',normalizeKey(m.team1,m.team2));
+      });
+      // Also check for live matches (score.ht exists but no ft)
+      matches.forEach(m=>{
+        if(m?.score?.ft) return;
+        if(!m?.score?.ht) return;
+        storeResult(m.team1, m.team2, m.score.ht[0], m.score.ht[1], 'HT', null);
+        found++;
       });
     },
   ];
