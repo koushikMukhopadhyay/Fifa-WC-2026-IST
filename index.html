@@ -92,6 +92,33 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
 #install-banner{display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:999;background:linear-gradient(135deg,#1a2a1a,#0f1f0f);border:1px solid #c9a227;border-radius:12px;padding:12px 18px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.6);max-width:320px;width:90%;}
 .legend-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
 @media(max-width:480px){.team-name{font-size:11px}.ist-time{font-size:12px}.score-box{font-size:14px;min-width:46px;}}
+
+/* MATCH DETAIL MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;align-items:flex-end;justify-content:center;}
+.modal-box{background:linear-gradient(135deg,#0d1b2a,#0a0e1a);border:1px solid rgba(201,162,39,0.3);border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:0 0 30px 0;position:relative;animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-drag{width:40px;height:4px;background:#334155;border-radius:2px;margin:12px auto 0;}
+.modal-header{padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.modal-teams{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.modal-team{flex:1;font-size:15px;font-weight:bold;text-align:center;}
+.modal-score{font-size:28px;font-weight:900;font-family:Arial,sans-serif;padding:6px 16px;border-radius:10px;background:rgba(255,255,255,0.06);letter-spacing:3px;}
+.modal-score.live{background:rgba(220,38,38,0.2);color:#fca5a5;border:1px solid #dc2626;}
+.modal-score.ft{background:rgba(34,197,94,0.12);color:#86efac;border:1px solid #22c55e44;}
+.modal-meta{display:flex;gap:12px;font-family:Arial,sans-serif;font-size:10px;color:var(--muted);margin-top:6px;flex-wrap:wrap;}
+.modal-section{padding:14px 18px 0;}
+.modal-section-title{font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.event-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-family:Arial,sans-serif;font-size:13px;}
+.event-row:last-child{border-bottom:none;}
+.event-min{font-size:11px;font-weight:900;color:#facc15;min-width:36px;font-family:Arial,sans-serif;}
+.event-icon{font-size:14px;flex-shrink:0;}
+.event-player{flex:1;}
+.event-team-badge{font-size:9px;padding:2px 6px;border-radius:6px;font-family:Arial,sans-serif;}
+.no-events{font-family:Arial,sans-serif;font-size:12px;color:var(--muted);padding:10px 0;text-align:center;}
+.modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#94a3b8;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;}
+.ht-badge{font-family:Arial,sans-serif;font-size:10px;color:var(--muted);padding:2px 8px;background:rgba(255,255,255,0.05);border-radius:6px;}
+.match-card{cursor:pointer;transition:transform .15s;}
+.match-card:hover{transform:translateY(-2px);}
 </style>
 </head>
 <body>
@@ -157,6 +184,23 @@ body{background:linear-gradient(135deg,#0a0e1a 0%,#0d1b2a 60%,#0a1520 100%);min-
     <div class="legend-row"><div style="width:8px;height:8px;border-radius:50%;background:#fb923c;flex-shrink:0"></div><span style="font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#fb923c;min-width:115px">1:30 – 3:30 AM</span><span style="font-family:Arial,sans-serif;font-size:10px;color:#475569">Deep night — alarm needed</span></div>
     <div class="legend-row"><div style="width:8px;height:8px;border-radius:50%;background:#f87171;flex-shrink:0"></div><span style="font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#f87171;min-width:115px">4:30 – 9:30 AM</span><span style="font-family:Arial,sans-serif;font-size:10px;color:#475569">Early morning — hardcore fans</span></div>
     <div style="font-family:Arial,sans-serif;font-size:9px;color:#334155;margin-top:7px">IST = ET + 9 hours 30 minutes.</div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="match-modal" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-drag"></div>
+    <button class="modal-close" onclick="document.getElementById('match-modal').classList.remove('open')">✕</button>
+    <div class="modal-header">
+      <div class="modal-teams">
+        <div class="modal-team" id="modal-t1">—</div>
+        <div class="modal-score" id="modal-score">VS</div>
+        <div class="modal-team" id="modal-t2">—</div>
+      </div>
+      <div class="modal-meta" id="modal-meta"></div>
+    </div>
+    <div id="modal-body"></div>
   </div>
 </div>
 
@@ -336,43 +380,117 @@ function isLive(s) { return ['1H','2H','HT','ET','PEN','LIVE'].includes(String(s
 function isFT(s)   { return ['FT','AET','PEN_DONE','FINISHED'].includes(String(s).toUpperCase()); }
 
 // ══════════════════════════════════════
-// FETCH SCORES from openfootball
+// MATCH EVENTS STORE (goals, cards)
 // ══════════════════════════════════════
-async function fetchAll() {
-  document.getElementById('last-updated').textContent = '🔄 Fetching...';
+const MATCH_EVENTS = {}; // mkey => {goals1, goals2, cards, ht}
+
+// ══════════════════════════════════════
+// LIVE SCORE FETCH
+// Source 1: RapidAPI live (browser works, server blocked)
+// Source 2: openfootball (completed results)
+// ══════════════════════════════════════
+const RAPIDAPI_KEY = '9d1b65a5bfmsh71480149ce4fb1ap1e168djsnbb143c7042b5';
+const RAPIDAPI_HOST = 'free-api-live-football-data.p.rapidapi.com';
+
+async function fetchLiveFromRapid() {
+  // Try multiple endpoints - one of them may return WC live data
+  const endpoints = [
+    '/football-live-scores',
+    '/football-live-matches',
+    '/football-live-scores-by-competition?compId=19',
+    '/football-live-scores-by-competition?compId=1',
+    '/football-live-scores-by-competition?compId=17',
+  ];
+  const headers = {
+    'x-rapidapi-key': RAPIDAPI_KEY,
+    'x-rapidapi-host': RAPIDAPI_HOST
+  };
+  for (const ep of endpoints) {
+    try {
+      const res = await fetch('https://' + RAPIDAPI_HOST + ep, { headers });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const matches = data?.response || data?.matches || data?.data || data?.results || (Array.isArray(data) ? data : []);
+      if (!Array.isArray(matches) || matches.length === 0) continue;
+      let found = 0;
+      matches.forEach(m => {
+        const t1 = m?.homeTeam?.name || m?.home?.name || m?.teams?.home?.name || m?.homeName || m?.strHomeTeam || '';
+        const t2 = m?.awayTeam?.name || m?.away?.name || m?.teams?.away?.name || m?.awayName || m?.strAwayTeam || '';
+        const hs = m?.score?.home ?? m?.goals?.home ?? m?.homeGoals ?? m?.score?.ft?.[0] ?? null;
+        const as_ = m?.score?.away ?? m?.goals?.away ?? m?.awayGoals ?? m?.score?.ft?.[1] ?? null;
+        const status = m?.status?.short || m?.status?.long || m?.status || m?.strStatus || 'LIVE';
+        const minute = m?.status?.elapsed || m?.minute || m?.elapsed || m?.intProgress || null;
+        if (t1 && t2 && hs !== null && as_ !== null) {
+          SCORES[mkey(t1, t2)] = { hs, as: as_, status, minute };
+          found++;
+        }
+      });
+      if (found > 0) { console.log('[Live] Found', found, 'from', ep); return found; }
+    } catch(e) { console.log('[Live] Endpoint failed:', ep, e.message); }
+  }
+  return 0;
+}
+
+async function fetchCompletedFromOpenFootball() {
+  const res = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json?t=' + Date.now());
+  const data = await res.json();
   let count = 0;
-  try {
-    const res = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json?t=' + Date.now());
-    const data = await res.json();
-    const matches = data.matches || [];
-    matches.forEach(m => {
-      if (!m.score) return;
-      const hs = m.score.ft ? m.score.ft[0] : (m.score.ht ? m.score.ht[0] : null);
-      const as = m.score.ft ? m.score.ft[1] : (m.score.ht ? m.score.ht[1] : null);
-      const status = m.score.ft ? 'FT' : 'HT';
-      if (hs !== null && as !== null) {
-        SCORES[mkey(m.team1, m.team2)] = { hs, as, status };
+  (data.matches || []).forEach(m => {
+    const k = mkey(m.team1, m.team2);
+    if (!m.score) return;
+    if (m.score.ft) {
+      SCORES[k] = { hs: m.score.ft[0], as: m.score.ft[1], status: 'FT', minute: null };
+      // Store goals and events
+      MATCH_EVENTS[k] = {
+        team1: m.team1, team2: m.team2,
+        ht: m.score.ht || null,
+        goals1: m.goals1 || [],
+        goals2: m.goals2 || [],
+        cards: [] // will be filled by live API if available
+      };
+      count++;
+    } else if (m.score.ht) {
+      const existing = SCORES[k];
+      if (!existing || existing.status !== 'FT') {
+        SCORES[k] = { hs: m.score.ht[0], as: m.score.ht[1], status: 'HT', minute: 45 };
+        MATCH_EVENTS[k] = {
+          team1: m.team1, team2: m.team2,
+          ht: m.score.ht,
+          goals1: m.goals1 || [],
+          goals2: m.goals2 || [],
+          cards: []
+        };
         count++;
       }
-    });
-    const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-    document.getElementById('last-updated').textContent = `✅ ${count} result(s) loaded — ${now} IST`;
-    if (document.getElementById('st-updated'))
-      document.getElementById('st-updated').textContent = `Updated: ${now} IST`;
-    // Show debug info
-    const db = document.getElementById('debug-bar');
-    if (db) {
-      const keys = Object.keys(SCORES);
-      db.style.display = 'block';
-      db.textContent = `✅ Scores loaded: ${keys.length} matches — keys: ${keys.slice(0,2).join(' | ')}`;
     }
-  } catch(e) {
-    console.error('Fetch error:', e);
-    const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-    document.getElementById('last-updated').textContent = `❌ Fetch failed: ${e.message} — ${now} IST`;
-    const db = document.getElementById('debug-bar');
-    if (db) { db.style.display='block'; db.style.color='#f87171'; db.textContent = 'Fetch error: '+e.message; }
+  });
+  return count;
+}
+
+async function fetchAll() {
+  document.getElementById('last-updated').textContent = '🔄 Fetching live scores...';
+  let liveCount = 0, ftCount = 0;
+  try {
+    // Try live API first
+    liveCount = await fetchLiveFromRapid();
+  } catch(e) { console.log('[Live] RapidAPI failed:', e.message); }
+  try {
+    // Always also load completed results from openfootball
+    ftCount = await fetchCompletedFromOpenFootball();
+  } catch(e) { console.log('[OF] Failed:', e.message); }
+  
+  const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+  const liveMatches = Object.values(SCORES).filter(s => isLive(s.status));
+  if (liveMatches.length > 0) {
+    document.getElementById('last-updated').textContent = `🔴 ${liveMatches.length} LIVE match${liveMatches.length>1?'es':''} — ${now} IST`;
+  } else {
+    document.getElementById('last-updated').textContent = `✅ ${ftCount} result(s) — ${now} IST`;
   }
+  if (document.getElementById('st-updated'))
+    document.getElementById('st-updated').textContent = `Updated: ${now} IST`;
+  // Hide debug bar now that it works
+  const db = document.getElementById('debug-bar');
+  if (db) db.style.display = 'none';
   gsR(); renderStandings(); koR();
 }
 
@@ -444,7 +562,7 @@ function tc(i) {
   return "#f87171";
 }
 
-function card(m) {
+function card(m, mid) {
   const gc = m.g ? (GC[m.g]||{}).c||"#334155" : SB[m.s]||"#334155";
   const col = tc(m.i);
   const sc = getScore(m);
@@ -455,9 +573,12 @@ function card(m) {
     const cls = live ? 'live' : ft ? 'ft' : '';
     mid = `<div class="score-box ${cls}">${sc.hs}–${sc.as}</div>`;
   }
-  const statusTxt = live ? `<span class="match-status" style="color:#f87171">🔴 LIVE</span>`
-                  : ft   ? `<span class="match-status" style="color:#22c55e">✅ FT</span>` : '';
-  return `<div class="match-card" style="background:linear-gradient(135deg,${BG[m.s]||"#0f1e35"} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
+  const minuteTxt = live && sc.minute ? ` ${sc.minute}'` : sc && sc.status === 'HT' ? ' HT' : '';
+  const statusTxt = live ? `<span class="match-status" style="color:#f87171;font-size:11px;font-weight:900">🔴 LIVE${minuteTxt}</span>`
+                  : ft   ? `<span class="match-status" style="color:#22c55e">✅ FT</span>` 
+                  : sc && sc.status === 'HT' ? `<span class="match-status" style="color:#facc15">⏸ HALF TIME</span>` : '';
+  const clickHandler = mid ? `onclick="openModal(RENDERED_MATCHES['${mid}'])"` : '';
+  return `<div class="match-card" ${clickHandler} style="background:linear-gradient(135deg,${BG[m.s]||"#0f1e35"} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
     <div class="card-accent" style="background:${live?'#dc2626':gc}"></div>
     <div class="card-body">
       <div class="card-badges">
@@ -476,14 +597,23 @@ function card(m) {
   </div>`;
 }
 
+// Store current list for modal access
+const RENDERED_MATCHES = {};
+
 function renderList(list, cId, lId) {
   const bd = {};
   list.forEach(m => { if (!bd[m.d]) bd[m.d] = []; bd[m.d].push(m); });
   let h = '';
+  let idx = 0;
   Object.entries(bd).forEach(([date, ms]) => {
     const hasLive = ms.some(m => { const sc = getScore(m); return sc && isLive(sc.status); });
     h += `<div class="dgl">${hasLive ? '<span class="live-dot"></span>' : ''}📅 ${date} — ${ms.length} match${ms.length>1?'es':''}</div>`;
-    ms.forEach(m => { h += card(m); });
+    ms.forEach(m => {
+      const mid = lId + '_' + idx;
+      RENDERED_MATCHES[mid] = m;
+      h += card(m, mid);
+      idx++;
+    });
   });
   document.getElementById(lId).innerHTML = h || '<div style="text-align:center;padding:30px;color:#475569;font-family:Arial,sans-serif">No matches.</div>';
   document.getElementById(cId).textContent = `Showing ${list.length} matches`;
@@ -541,10 +671,110 @@ function showTab(tab, btn) {
   if (tab === 'standings') renderStandings();
 }
 
+
+// ══════════════════════════════════════
+// MATCH DETAIL MODAL
+// ══════════════════════════════════════
+function openModal(m) {
+  const sc = getScore(m);
+  const events = m.h1 ? MATCH_EVENTS[mkey(m.h1, m.h2)] : null;
+  const gc = m.g ? (GC[m.g]||{}).c||"#c9a227" : "#c9a227";
+
+  // Score
+  const live = sc && isLive(sc.status);
+  const ft   = sc && isFT(sc.status);
+  const scoreCls = live ? 'live' : ft ? 'ft' : '';
+  const scoreStr = sc ? `${sc.hs}–${sc.as}` : 'VS';
+  document.getElementById('modal-t1').textContent = m.t1;
+  document.getElementById('modal-t2').textContent = m.t2;
+  const scoreEl = document.getElementById('modal-score');
+  scoreEl.textContent = scoreStr;
+  scoreEl.className = 'modal-score ' + scoreCls;
+
+  // Meta
+  let metaHtml = `<span>📅 ${m.d}</span><span>🕐 ${m.i}</span><span>📍 ${m.v}</span>`;
+  if (live && sc.minute) metaHtml += `<span style="color:#f87171;font-weight:bold">🔴 LIVE ${sc.minute}'</span>`;
+  if (ft) metaHtml += `<span style="color:#22c55e">✅ Full Time</span>`;
+  if (events?.ht) metaHtml += `<span class="ht-badge">HT: ${events.ht[0]}–${events.ht[1]}</span>`;
+  document.getElementById('modal-meta').innerHTML = metaHtml;
+
+  // Body
+  let bodyHtml = '';
+
+  if (events && (events.goals1.length > 0 || events.goals2.length > 0)) {
+    // Merge and sort all goals by minute
+    const allGoals = [
+      ...events.goals1.map(g=>({...g, team: m.t1, side:1})),
+      ...events.goals2.map(g=>({...g, team: m.t2, side:2}))
+    ].sort((a,b) => parseInt(a.minute) - parseInt(b.minute));
+
+    bodyHtml += `<div class="modal-section">
+      <div class="modal-section-title">⚽ GOALS</div>`;
+    allGoals.forEach(g => {
+      const icon = g.penalty ? '⚽ (P)' : '⚽';
+      const ownGoal = g.ownGoal ? ' (OG)' : '';
+      const teamColor = g.side === 1 ? gc : '#94a3b8';
+      bodyHtml += `<div class="event-row">
+        <span class="event-min">${g.minute}'</span>
+        <span class="event-icon">${g.penalty ? '🎯' : '⚽'}</span>
+        <span class="event-player">${g.name}${ownGoal}${g.penalty ? ' <span style="font-size:10px;color:#facc15">(Penalty)</span>' : ''}</span>
+        <span class="event-team-badge" style="background:${teamColor}22;color:${teamColor}">${g.team.replace(/🇲🇽|🇰🇷|🇿🇦|🇨🇿|🇨🇦|🇨🇭|🇶🇦|🇧🇦|🇧🇷|🇲🇦|🏴󠁧󠁢󠁳󠁣󠁴󠁿|🇭🇹|🇺🇸|🇦🇺|🇵🇾|🇹🇷|🇩🇪|🇨🇼|🇨🇮|🇪🇨|🇳🇱|🇯🇵|🇸🇪|🇹🇳|🇧🇪|🇮🇷|🇪🇬|🇳🇿|🇪🇸|🇺🇾|🇸🇦|🇨🇻|🇫🇷|🇸🇳|🇳🇴|🇮🇶|🇦🇷|🇦🇹|🇩🇿|🇯🇴|🇵🇹|🇨🇴|🇺🇿|🇨🇩|🏴󠁧󠁢󠁥󠁮󠁧󠁿|🇭🇷|🇵🇦|🇬🇭/gu,'').trim()}</span>
+      </div>`;
+    });
+    bodyHtml += `</div>`;
+  } else if (sc) {
+    bodyHtml += `<div class="modal-section"><div class="no-events">⚽ Goal scorer data loading...</div></div>`;
+  }
+
+  // Cards section
+  if (events?.cards && events.cards.length > 0) {
+    bodyHtml += `<div class="modal-section" style="margin-top:14px">
+      <div class="modal-section-title">🟨 CARDS</div>`;
+    events.cards.forEach(c => {
+      const icon = c.type === 'red' ? '🟥' : '🟨';
+      bodyHtml += `<div class="event-row">
+        <span class="event-min">${c.minute}'</span>
+        <span class="event-icon">${icon}</span>
+        <span class="event-player">${c.player}</span>
+        <span class="event-team-badge" style="background:rgba(100,116,139,0.2);color:#94a3b8">${c.team}</span>
+      </div>`;
+    });
+    bodyHtml += `</div>`;
+  } else if (sc) {
+    bodyHtml += `<div class="modal-section" style="margin-top:14px">
+      <div class="modal-section-title">🟨 CARDS</div>
+      <div class="no-events">Card data will appear here when available from live API</div>
+    </div>`;
+  }
+
+  if (!sc) {
+    bodyHtml += `<div class="modal-section"><div class="no-events" style="padding:20px 0">Match not yet played<br><span style="font-size:11px;color:#334155">Check back at ${m.i}</span></div></div>`;
+  }
+
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('match-modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('match-modal')) {
+    document.getElementById('match-modal').classList.remove('open');
+  }
+}
+
 // INIT
 buildGS(); gsR(); buildKO(); koR(); renderGroups(); renderStandings();
 fetchAll();
-setInterval(fetchAll, 60000);
+// Refresh every 30s during likely match times, 60s otherwise
+function smartRefresh() {
+  const now = new Date();
+  const istOffset = 5.5 * 60;
+  const istTime = new Date(now.getTime() + (istOffset - now.getTimezoneOffset()) * 60000);
+  const h = istTime.getUTCHours();
+  // Match hours in IST: 9:30PM-11PM, 12AM-3AM, 4:30AM-10AM
+  const isMatchTime = (h >= 21) || (h <= 10);
+  setTimeout(() => { fetchAll().then(smartRefresh); }, isMatchTime ? 30000 : 60000);
+}
+smartRefresh();
 
 // PWA
 let dp;
