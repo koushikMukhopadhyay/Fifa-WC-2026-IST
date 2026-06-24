@@ -635,50 +635,40 @@ function showTab(id,btn){
 // ── LIVE FETCH ──
 // Source 1: ESPN (live minutes, no key needed, browser CORS ok)
 // Source 2: openfootball (final scores + goals)
-async function fetchESPN() {
-  // ESPN's unofficial free API - works from browser, no key
-  const url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('ESPN ' + res.status);
-  const data = await res.json();
+async function fetchLiveScores() {
+  // TheSportsDB - completely free, no API key, CORS enabled, has live minutes
+  const urls = [
+    'https://www.thesportsdb.com/api/v2/json/livescore.php?s=Soccer',
+    'https://www.thesportsdb.com/api/v1/json/3/livescore.php?s=Soccer',
+  ];
   let found = 0;
-  (data.events || []).forEach(ev => {
-    const comp = ev.competitions?.[0];
-    if (!comp) return;
-    const home = comp.competitors?.find(c => c.homeAway === 'home');
-    const away = comp.competitors?.find(c => c.homeAway === 'away');
-    if (!home || !away) return;
-    const t1 = home.team?.displayName || home.team?.name || '';
-    const t2 = away.team?.displayName || away.team?.name || '';
-    const hs = parseInt(home.score) || 0;
-    const as_ = parseInt(away.score) || 0;
-    const state = ev.status?.type?.state || '';
-    const detail = ev.status?.type?.shortDetail || ev.status?.displayClock || '';
-    // Parse minute from detail like "45'", "90+2'", "HT", "FT"
-    let status = 'SCH', minute = null;
-    if (state === 'in') {
-      status = 'LIVE';
-      const minMatch = detail.match(/^(\d+)/);
-      if (minMatch) minute = parseInt(minMatch[1]);
-      else if (detail.includes('HT') || detail.includes('Half')) { status='HT'; minute=45; }
-    } else if (state === 'post') {
-      status = 'FT';
-    }
-    if (t1 && t2 && (status === 'LIVE' || status === 'HT' || status === 'FT')) {
-      const k = mk(t1, t2);
-      // Also try with name variations
-      const k2 = mk(t1.replace('Cote d'Ivoire','Ivory Coast').replace('Côte d'Ivoire','Ivory Coast'), 
-                    t2.replace('Cote d'Ivoire','Ivory Coast').replace('Côte d'Ivoire','Ivory Coast'));
-      const existing = SCORES[k] || SCORES[k2];
-      // Only overwrite FT if ESPN also says FT, otherwise live data wins
-      if (!existing || existing.status !== 'FT' || status === 'FT') {
-        SCORES[k] = { hs, as: as_, status, minute };
-        if (k !== k2) SCORES[k2] = { hs, as: as_, status, minute };
-        found++;
-        console.log('[ESPN]', t1, hs, '-', as_, t2, status, minute ? minute+"'" : '');
-      }
-    }
-  });
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const events = data?.events || data?.results || [];
+      if (!Array.isArray(events) || events.length === 0) continue;
+      events.forEach(ev => {
+        const t1 = ev.strHomeTeam || ev.strTeam1 || '';
+        const t2 = ev.strAwayTeam || ev.strTeam2 || '';
+        const hs = ev.intHomeScore !== null ? parseInt(ev.intHomeScore) : null;
+        const as_ = ev.intAwayScore !== null ? parseInt(ev.intAwayScore) : null;
+        // strStatus is the minute e.g. "67" or "HT" or "FT"
+        const st = ev.strStatus || ev.strProgress || '';
+        let status = 'LIVE', minute = null;
+        if (st === 'HT') { status = 'HT'; minute = 45; }
+        else if (st === 'FT' || st === 'AET') { status = 'FT'; }
+        else if (st && !isNaN(parseInt(st))) { status = 'LIVE'; minute = parseInt(st); }
+        if (t1 && t2 && hs !== null) {
+          SCORES[mk(t1,t2)] = {hs, as:as_, status, minute};
+          found++;
+          console.log('[Live]',t1,hs,'-',as_,t2,status,minute?minute+"'":'');
+        }
+      });
+      if (found > 0) break;
+    } catch(e) { console.log('[Live] error:', e.message); }
+  }
   return found;
 }
 
@@ -716,9 +706,9 @@ async function doFetch() {
 
   // Try ESPN for live data first
   try {
-    liveFound = await fetchESPN();
+    liveFound = await fetchLiveScores();
     console.log('[ESPN] live matches found:', liveFound);
-  } catch(e) { console.log('[ESPN] failed:', e.message); }
+  } catch(e) { console.log('[Live] failed:', e.message); }
 
   // Always fetch openfootball for final scores + goals
   try {
