@@ -293,38 +293,44 @@ const GM=[
 ];
 
 const KM=[
-  {d:"Sun 29 Jun",k:"29 Jun",i:"12:30 AM IST",t1:"R32 Match 1",t2:"TBD",v:"SoFi Stadium, LA",s:"R32"},
-  {d:"Sun 29 Jun",k:"29 Jun",i:"10:30 PM IST",t1:"R32 Match 2",t2:"TBD",v:"NRG Stadium, Houston",s:"R32"},
-  {d:"Mon 30 Jun",k:"30 Jun",i:"2:00 AM IST",t1:"R32 Match 3",t2:"TBD",v:"Gillette, Boston",s:"R32"},
-  {d:"Mon 30 Jun",k:"30 Jun",i:"6:30 AM IST",t1:"R32 Match 4",t2:"TBD",v:"BBVA, Monterrey",s:"R32"},
-  {d:"Mon 30 Jun",k:"30 Jun",i:"10:30 PM IST",t1:"R32 Match 5",t2:"TBD",v:"AT&T Stadium, Dallas",s:"R32"},
-  {d:"Tue 1 Jul",k:"1 Jul",i:"2:30 AM IST",t1:"R32 Match 6",t2:"TBD",v:"MetLife, New York/NJ",s:"R32"},
-  {d:"Tue 1 Jul",k:"1 Jul",i:"6:30 AM IST",t1:"R32 Match 7",t2:"TBD",v:"Azteca, Mexico City",s:"R32"},
-  {d:"Tue 1 Jul",k:"1 Jul",i:"9:30 PM IST",t1:"R32 Match 8",t2:"TBD",v:"Mercedes-Benz, Atlanta",s:"R32"},
-  {d:"Wed 2 Jul",k:"2 Jul",i:"1:30 AM IST",t1:"R32 Match 9",t2:"TBD",v:"Lumen Field, Seattle",s:"R32"},
-  {d:"Wed 2 Jul",k:"2 Jul",i:"5:30 AM IST",t1:"R32 Match 10",t2:"TBD",v:"Levi's, San Francisco",s:"R32"},
-  {d:"Thu 3 Jul",k:"3 Jul",i:"12:30 AM IST",t1:"R32 Match 11",t2:"TBD",v:"SoFi Stadium, LA",s:"R32"},
-  {d:"Thu 3 Jul",k:"3 Jul",i:"4:30 AM IST",t1:"R32 Match 12",t2:"TBD",v:"BMO Field, Toronto",s:"R32"},
-  {d:"Thu 3 Jul",k:"3 Jul",i:"8:30 AM IST",t1:"R32 Match 13",t2:"TBD",v:"BC Place, Vancouver",s:"R32"},
-  {d:"Thu 3 Jul",k:"3 Jul",i:"11:30 PM IST",t1:"R32 Match 14",t2:"TBD",v:"AT&T Stadium, Dallas",s:"R32"},
-  {d:"Fri 4 Jul",k:"4 Jul",i:"3:30 AM IST",t1:"R32 Match 15",t2:"TBD",v:"Hard Rock, Miami",s:"R32"},
-  {d:"Fri 4 Jul",k:"4 Jul",i:"7:00 AM IST",t1:"R32 Match 16",t2:"TBD",v:"Arrowhead, Kansas City",s:"R32"},
-  {d:"Fri 4 Jul",k:"4 Jul",i:"10:30 PM IST",t1:"R16 Match 1",t2:"TBD",v:"NRG Stadium, Houston",s:"R16"},
-  {d:"Sat 5 Jul",k:"5 Jul",i:"1:30 AM IST",t1:"R16 Match 2",t2:"TBD",v:"MetLife, New York/NJ",s:"R16"},
-  {d:"Sat 5 Jul",k:"5 Jul",i:"2:30 AM IST",t1:"R16 Match 3",t2:"TBD",v:"Lincoln Fin., Philly",s:"R16"},
-  {d:"Sun 6 Jul",k:"6 Jul",i:"12:30 AM IST",t1:"R16 Match 4",t2:"TBD",v:"AT&T Stadium, Dallas",s:"R16"},
-  {d:"Sun 6 Jul",k:"6 Jul",i:"5:30 AM IST",t1:"R16 Match 5",t2:"TBD",v:"Lumen Field, Seattle",s:"R16"},
-  {d:"Mon 7 Jul",k:"7 Jul",i:"9:30 PM IST",t1:"R16 Match 6",t2:"TBD",v:"Mercedes-Benz, Atlanta",s:"R16"},
-  {d:"Tue 8 Jul",k:"8 Jul",i:"1:30 AM IST",t1:"R16 Match 7",t2:"TBD",v:"BC Place, Vancouver",s:"R16"},
-  {d:"Tue 8 Jul",k:"8 Jul",i:"5:30 AM IST",t1:"R16 Match 8",t2:"TBD",v:"Azteca, Mexico City",s:"R16"},
-  {d:"Thu 10 Jul",k:"10 Jul",i:"1:30 AM IST",t1:"Quarter-Final 1",t2:"TBD",v:"Gillette, Boston",s:"QF"},
-  {d:"Fri 11 Jul",k:"11 Jul",i:"12:30 AM IST",t1:"Quarter-Final 2",t2:"TBD",v:"SoFi Stadium, LA",s:"QF"},
-  {d:"Sat 12 Jul",k:"12 Jul",i:"2:30 AM IST",t1:"Quarter-Final 3",t2:"TBD",v:"Hard Rock, Miami",s:"QF"},
-  {d:"Sun 13 Jul",k:"13 Jul",i:"12:30 AM IST",t1:"Quarter-Final 4",t2:"TBD",v:"AT&T Stadium, Dallas",s:"QF"},
-  {d:"Tue 15 Jul",k:"15 Jul",i:"12:30 AM IST",t1:"Semi-Final 1",t2:"TBD",v:"AT&T Stadium, Dallas",s:"SF"},
-  {d:"Wed 16 Jul",k:"16 Jul",i:"12:30 AM IST",t1:"Semi-Final 2",t2:"TBD",v:"Mercedes-Benz, Atlanta",s:"SF"},
-  {d:"Sat 19 Jul",k:"19 Jul",i:"12:30 AM IST",t1:"3rd Place Play-Off",t2:"TBD",v:"Hard Rock, Miami",s:"3RD"},
-  {d:"Sun 20 Jul",k:"20 Jul",i:"12:30 AM IST",t1:"🏆 THE FINAL",t2:"TBD",v:"MetLife Stadium, New York/NJ",s:"FINAL"},
+  // R32
+  {d:"Sun 29 Jun",k:"29 Jun",i:"12:30 AM IST",s:"R32",v:"SoFi Stadium, LA",      t1:"TBD",t2:"TBD",mn:73,s1:"2A",  s2:"2B"},
+  {d:"Sun 29 Jun",k:"29 Jun",i:"10:30 PM IST",s:"R32",v:"NRG Stadium, Houston",  t1:"TBD",t2:"TBD",mn:76,s1:"1C",  s2:"2F"},
+  {d:"Mon 30 Jun",k:"30 Jun",i:"2:00 AM IST", s:"R32",v:"Gillette, Boston",       t1:"TBD",t2:"TBD",mn:74,s1:"1E",  s2:"3rd"},
+  {d:"Mon 30 Jun",k:"30 Jun",i:"6:30 AM IST", s:"R32",v:"BBVA, Monterrey",        t1:"TBD",t2:"TBD",mn:75,s1:"1F",  s2:"2C"},
+  {d:"Mon 30 Jun",k:"30 Jun",i:"10:30 PM IST",s:"R32",v:"AT&T Stadium, Dallas",  t1:"TBD",t2:"TBD",mn:78,s1:"2E",  s2:"2I"},
+  {d:"Tue 1 Jul", k:"1 Jul", i:"2:30 AM IST", s:"R32",v:"MetLife, New York/NJ",  t1:"TBD",t2:"TBD",mn:77,s1:"1I",  s2:"3rd"},
+  {d:"Tue 1 Jul", k:"1 Jul", i:"6:30 AM IST", s:"R32",v:"Azteca, Mexico City",   t1:"TBD",t2:"TBD",mn:79,s1:"1A",  s2:"3rd"},
+  {d:"Tue 1 Jul", k:"1 Jul", i:"9:30 PM IST", s:"R32",v:"Mercedes-Benz, Atlanta",t1:"TBD",t2:"TBD",mn:80,s1:"1L",  s2:"3rd"},
+  {d:"Wed 2 Jul", k:"2 Jul", i:"1:30 AM IST", s:"R32",v:"Lumen Field, Seattle",  t1:"TBD",t2:"TBD",mn:82,s1:"1G",  s2:"3rd"},
+  {d:"Wed 2 Jul", k:"2 Jul", i:"5:30 AM IST", s:"R32",v:"Levi's, San Francisco", t1:"TBD",t2:"TBD",mn:81,s1:"1D",  s2:"3rd"},
+  {d:"Thu 3 Jul", k:"3 Jul", i:"12:30 AM IST",s:"R32",v:"SoFi Stadium, LA",      t1:"TBD",t2:"TBD",mn:84,s1:"1H",  s2:"2J"},
+  {d:"Thu 3 Jul", k:"3 Jul", i:"4:30 AM IST", s:"R32",v:"BMO Field, Toronto",    t1:"TBD",t2:"TBD",mn:83,s1:"2K",  s2:"2L"},
+  {d:"Thu 3 Jul", k:"3 Jul", i:"8:30 AM IST", s:"R32",v:"BC Place, Vancouver",   t1:"TBD",t2:"TBD",mn:85,s1:"1B",  s2:"3rd"},
+  {d:"Thu 3 Jul", k:"3 Jul", i:"11:30 PM IST",s:"R32",v:"AT&T Stadium, Dallas",  t1:"TBD",t2:"TBD",mn:88,s1:"2D",  s2:"2G"},
+  {d:"Fri 4 Jul", k:"4 Jul", i:"3:30 AM IST", s:"R32",v:"Hard Rock, Miami",      t1:"TBD",t2:"TBD",mn:86,s1:"1J",  s2:"2H"},
+  {d:"Fri 4 Jul", k:"4 Jul", i:"7:00 AM IST", s:"R32",v:"Arrowhead, Kansas City",t1:"TBD",t2:"TBD",mn:87,s1:"1K",  s2:"3rd"},
+  // R16
+  {d:"Fri 4 Jul", k:"4 Jul", i:"10:30 PM IST",s:"R16",v:"NRG Stadium, Houston",  t1:"TBD",t2:"TBD",mn:90,s1:"W73", s2:"W75"},
+  {d:"Sat 5 Jul", k:"5 Jul", i:"2:30 AM IST", s:"R16",v:"Lincoln Fin., Philly",  t1:"TBD",t2:"TBD",mn:89,s1:"W74", s2:"W77"},
+  {d:"Sun 6 Jul", k:"6 Jul", i:"1:30 AM IST", s:"R16",v:"MetLife, New York/NJ",  t1:"TBD",t2:"TBD",mn:91,s1:"W76", s2:"W78"},
+  {d:"Sun 6 Jul", k:"6 Jul", i:"5:30 AM IST", s:"R16",v:"Azteca, Mexico City",   t1:"TBD",t2:"TBD",mn:92,s1:"W79", s2:"W80"},
+  {d:"Mon 7 Jul", k:"7 Jul", i:"12:30 AM IST",s:"R16",v:"AT&T Stadium, Dallas",  t1:"TBD",t2:"TBD",mn:93,s1:"W83", s2:"W84"},
+  {d:"Mon 7 Jul", k:"7 Jul", i:"5:30 AM IST", s:"R16",v:"Lumen Field, Seattle",  t1:"TBD",t2:"TBD",mn:94,s1:"W81", s2:"W82"},
+  {d:"Mon 7 Jul", k:"7 Jul", i:"9:30 PM IST", s:"R16",v:"Mercedes-Benz, Atlanta",t1:"TBD",t2:"TBD",mn:95,s1:"W86", s2:"W88"},
+  {d:"Tue 8 Jul", k:"8 Jul", i:"1:30 AM IST", s:"R16",v:"BC Place, Vancouver",   t1:"TBD",t2:"TBD",mn:96,s1:"W85", s2:"W87"},
+  // QF
+  {d:"Thu 10 Jul",k:"10 Jul",i:"1:30 AM IST", s:"QF", v:"Gillette, Boston",       t1:"TBD",t2:"TBD",mn:97, s1:"W89", s2:"W90"},
+  {d:"Fri 11 Jul",k:"11 Jul",i:"12:30 AM IST",s:"QF", v:"SoFi Stadium, LA",       t1:"TBD",t2:"TBD",mn:98, s1:"W93", s2:"W94"},
+  {d:"Sat 12 Jul",k:"12 Jul",i:"2:30 AM IST", s:"QF", v:"Hard Rock, Miami",        t1:"TBD",t2:"TBD",mn:99, s1:"W91", s2:"W92"},
+  {d:"Sat 12 Jul",k:"12 Jul",i:"6:30 AM IST", s:"QF", v:"AT&T Stadium, Dallas",    t1:"TBD",t2:"TBD",mn:100,s1:"W95", s2:"W96"},
+  // SF
+  {d:"Tue 15 Jul",k:"15 Jul",i:"12:30 AM IST",s:"SF", v:"AT&T Stadium, Dallas",    t1:"TBD",t2:"TBD",mn:101,s1:"W97", s2:"W98"},
+  {d:"Wed 16 Jul",k:"16 Jul",i:"12:30 AM IST",s:"SF", v:"Mercedes-Benz, Atlanta",  t1:"TBD",t2:"TBD",mn:102,s1:"W99", s2:"W100"},
+  // 3RD
+  {d:"Sat 19 Jul",k:"19 Jul",i:"12:30 AM IST",s:"3RD",v:"Hard Rock, Miami",        t1:"TBD",t2:"TBD",mn:103,s1:"L101",s2:"L102"},
+  // FINAL
+  {d:"Sun 20 Jul",k:"20 Jul",i:"12:30 AM IST",s:"FINAL",v:"MetLife Stadium, NJ",   t1:"TBD",t2:"TBD",mn:104,s1:"W101",s2:"W102"},
 ];
 
 const SCORES = {
@@ -513,8 +519,9 @@ function koRd(r,b){
   koR();
 }
 
-// STANDINGS
-function renderStd(){
+
+// ── KNOCKOUT SLOT RESOLVER ──
+function calcStandings(){
   const st={};
   Object.entries(GC).forEach(([grp,data])=>{
     st[grp]={};
@@ -523,11 +530,63 @@ function renderStd(){
   GM.forEach(m=>{
     const sc=gsc(m);
     if(!sc||!isFT(sc.status))return;
-    const h=st[m.g]?.[m.h1], a=st[m.g]?.[m.h2];
+    const h=st[m.g]?.[m.h1],a=st[m.g]?.[m.h2];
     if(!h||!a)return;
     h.mp++;a.mp++;h.gf+=sc.hs;h.ga+=sc.as;h.gd+=sc.hs-sc.as;a.gf+=sc.as;a.ga+=sc.hs;a.gd+=sc.as-sc.hs;
     if(sc.hs>sc.as){h.w++;h.pts+=3;a.l++;}else if(sc.hs<sc.as){a.w++;a.pts+=3;h.l++;}else{h.d++;h.pts++;a.d++;a.pts++;}
   });
+  return st;
+}
+
+function resolveKOSlot(slot, qual, mres){
+  if(!slot||slot==='TBD') return 'TBD';
+  // Group winner/runner-up
+  const gm = slot.match(/^([12])([A-L])$/);
+  if(gm) return qual[slot] || ('Group '+gm[2]+' '+(gm[1]==='1'?'Winner':'Runner-up'));
+  // 3rd place
+  if(slot==='3rd') return '🏅 Best 3rd Place';
+  // Match winner
+  const wm = slot.match(/^W(\d+)$/);
+  if(wm) return mres[parseInt(wm[1])]?.w || ('Winner M'+wm[1]);
+  // Match loser
+  const lm = slot.match(/^L(\d+)$/);
+  if(lm) return mres[parseInt(lm[1])]?.l || ('Loser M'+lm[1]);
+  return slot;
+}
+
+function resolveKOTeams(){
+  const st = calcStandings();
+  const qual = {};
+  Object.entries(st).forEach(([grp,teams])=>{
+    const sorted=Object.values(teams).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+    if(sorted[0]) qual['1'+grp]=sorted[0].display;
+    if(sorted[1]) qual['2'+grp]=sorted[1].display;
+  });
+  const mres = {}; // matchNum -> {w:winner, l:loser}
+  // Two passes: first resolve what we can, second pass gets W/L from resolved matches
+  for(let pass=0;pass<2;pass++){
+    KM.forEach(m=>{
+      m.t1 = resolveKOSlot(m.s1, qual, mres);
+      m.t2 = resolveKOSlot(m.s2, qual, mres);
+      // Check if this match has a result in SCORES
+      if(m.mn && m.t1!=='TBD' && m.t2!=='TBD'){
+        const clean = s => s.replace(/[^\w ]/g,'').trim();
+        const k = mk(clean(m.t1), clean(m.t2));
+        const sc = SCORES[k];
+        if(sc && isFT(sc.status)){
+          mres[m.mn] = {
+            w: sc.hs>sc.as ? m.t1 : m.t2,
+            l: sc.hs>sc.as ? m.t2 : m.t1
+          };
+        }
+      }
+    });
+  }
+}
+
+// STANDINGS
+function renderStd(){
+  const st=calcStandings();
   let html='';
   Object.entries(GC).forEach(([grp,data])=>{
     const teams=Object.values(st[grp]).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
@@ -602,11 +661,11 @@ async function doFetch(){
   }catch(e){
     document.getElementById('rinfo').textContent='⚠️ Using cached data';
   }
-  gsR(); renderStd(); koR();
+  resolveKOTeams(); gsR(); renderStd(); koR();
 }
 
 // INIT
-buildGS(); gsR(); buildKO(); koR(); renderGrp(); renderStd();
+buildGS(); resolveKOTeams(); gsR(); buildKO(); koR(); renderGrp(); renderStd();
 doFetch();
 function autoRefresh(){setTimeout(()=>{doFetch().then(autoRefresh);},60000);}
 autoRefresh();
