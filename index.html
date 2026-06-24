@@ -431,7 +431,8 @@ function card(m, src, idx){
   const live=sc&&isLive(sc.status), ft=sc&&isFT(sc.status);
   let mid=`<div class="vs">VS</div>`;
   if(sc){const cls=live?'live':ft?'ft':'';mid=`<div class="sbox ${cls}">${sc.hs}–${sc.as}</div>`;}
-  const stxt=live?`<span style="color:#f87171;font-size:11px;font-weight:900;font-family:Arial,sans-serif">🔴 LIVE${sc&&sc.minute?' '+sc.minute+"'":''}  </span>`
+  const minStr = sc?.minute ? ` ${sc.minute}'` : '';
+  const stxt=live?`<span style="color:#f87171;font-size:12px;font-weight:900;font-family:Arial,sans-serif;letter-spacing:.5px">🔴 LIVE${minStr}</span>`
     :ft?`<span style="color:#22c55e;font-size:10px;font-family:Arial,sans-serif">✅ FT</span>`:'';
   const hint=ft?`<div class="hint">⚽ Tap for goal scorers & details</div>`:(!sc?`<div class="hint">Tap for match info</div>`:'');
   return `<div class="mc" onclick="openM('${src}',${idx})" style="background:linear-gradient(135deg,${BG[m.s]||'#0f1e35'} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
@@ -631,36 +632,109 @@ function showTab(id,btn){
   if(id==='std')renderStd();
 }
 
-// LIVE FETCH
-async function doFetch(){
-  document.getElementById('rinfo').textContent='🔄 Fetching...';
-  try{
-    const res=await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json?t='+Date.now());
-    const data=await res.json();
-    let cnt=0;
-    (data.matches||[]).forEach(m=>{
-      const k=mk(m.team1,m.team2);
-      if(m.score&&m.score.ft){
-        SCORES[k]={hs:m.score.ft[0],as:m.score.ft[1],status:'FT',minute:null};
-        const goals=[
-          ...(m.goals1||[]).map(g=>({min:g.minute,player:g.name,team:m.team1,side:1,pen:!!g.penalty,og:!!g.owngoal})),
-          ...(m.goals2||[]).map(g=>({min:g.minute,player:g.name,team:m.team2,side:2,pen:!!g.penalty,og:!!g.owngoal}))
-        ];
-        EVENTS[k]={ht:m.score.ht||null,t1:m.team1,t2:m.team2,goals,cards:[]};
-        cnt++;
-      } else if(m.score&&m.score.ht){
-        if(!SCORES[k]||SCORES[k].status!=='FT'){
-          SCORES[k]={hs:m.score.ht[0],as:m.score.ht[1],status:'HT',minute:45};cnt++;
-        }
+// ── LIVE FETCH ──
+// Source 1: ESPN (live minutes, no key needed, browser CORS ok)
+// Source 2: openfootball (final scores + goals)
+async function fetchESPN() {
+  // ESPN's unofficial free API - works from browser, no key
+  const url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('ESPN ' + res.status);
+  const data = await res.json();
+  let found = 0;
+  (data.events || []).forEach(ev => {
+    const comp = ev.competitions?.[0];
+    if (!comp) return;
+    const home = comp.competitors?.find(c => c.homeAway === 'home');
+    const away = comp.competitors?.find(c => c.homeAway === 'away');
+    if (!home || !away) return;
+    const t1 = home.team?.displayName || home.team?.name || '';
+    const t2 = away.team?.displayName || away.team?.name || '';
+    const hs = parseInt(home.score) || 0;
+    const as_ = parseInt(away.score) || 0;
+    const state = ev.status?.type?.state || '';
+    const detail = ev.status?.type?.shortDetail || ev.status?.displayClock || '';
+    // Parse minute from detail like "45'", "90+2'", "HT", "FT"
+    let status = 'SCH', minute = null;
+    if (state === 'in') {
+      status = 'LIVE';
+      const minMatch = detail.match(/^(\d+)/);
+      if (minMatch) minute = parseInt(minMatch[1]);
+      else if (detail.includes('HT') || detail.includes('Half')) { status='HT'; minute=45; }
+    } else if (state === 'post') {
+      status = 'FT';
+    }
+    if (t1 && t2 && (status === 'LIVE' || status === 'HT' || status === 'FT')) {
+      const k = mk(t1, t2);
+      // Also try with name variations
+      const k2 = mk(t1.replace('Cote d'Ivoire','Ivory Coast').replace('Côte d'Ivoire','Ivory Coast'), 
+                    t2.replace('Cote d'Ivoire','Ivory Coast').replace('Côte d'Ivoire','Ivory Coast'));
+      const existing = SCORES[k] || SCORES[k2];
+      // Only overwrite FT if ESPN also says FT, otherwise live data wins
+      if (!existing || existing.status !== 'FT' || status === 'FT') {
+        SCORES[k] = { hs, as: as_, status, minute };
+        if (k !== k2) SCORES[k2] = { hs, as: as_, status, minute };
+        found++;
+        console.log('[ESPN]', t1, hs, '-', as_, t2, status, minute ? minute+"'" : '');
       }
-    });
-    const now=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-    const lv=Object.values(SCORES).filter(s=>isLive(s.status));
-    document.getElementById('rinfo').textContent=lv.length>0?`🔴 ${lv.length} LIVE — ${now} IST`:`✅ ${cnt} results — ${now} IST`;
-    if(document.getElementById('stinfo'))document.getElementById('stinfo').textContent=`Updated: ${now} IST`;
-  }catch(e){
-    document.getElementById('rinfo').textContent='⚠️ Using cached data';
+    }
+  });
+  return found;
+}
+
+async function fetchOpenFootball() {
+  const res = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json?t=' + Date.now());
+  const data = await res.json();
+  let cnt = 0;
+  (data.matches || []).forEach(m => {
+    const k = mk(m.team1, m.team2);
+    if (m.score?.ft) {
+      // Don't overwrite a live score with FT if ESPN said it's live
+      const existing = SCORES[k];
+      if (!existing || existing.status !== 'LIVE') {
+        SCORES[k] = { hs: m.score.ft[0], as: m.score.ft[1], status:'FT', minute:null };
+      }
+      const goals = [
+        ...(m.goals1||[]).map(g=>({min:g.minute,player:g.name,team:m.team1,side:1,pen:!!g.penalty,og:!!g.owngoal})),
+        ...(m.goals2||[]).map(g=>({min:g.minute,player:g.name,team:m.team2,side:2,pen:!!g.penalty,og:!!g.owngoal}))
+      ];
+      EVENTS[k] = { ht: m.score.ht||null, t1:m.team1, t2:m.team2, goals, cards:[] };
+      cnt++;
+    } else if (m.score?.ht) {
+      if (!SCORES[k] || SCORES[k].status === 'SCH') {
+        SCORES[k] = { hs: m.score.ht[0], as: m.score.ht[1], status:'HT', minute:45 };
+        cnt++;
+      }
+    }
+  });
+  return cnt;
+}
+
+async function doFetch() {
+  document.getElementById('rinfo').textContent = '🔄 Fetching live scores...';
+  let liveFound = 0, ftCnt = 0;
+
+  // Try ESPN for live data first
+  try {
+    liveFound = await fetchESPN();
+    console.log('[ESPN] live matches found:', liveFound);
+  } catch(e) { console.log('[ESPN] failed:', e.message); }
+
+  // Always fetch openfootball for final scores + goals
+  try {
+    ftCnt = await fetchOpenFootball();
+  } catch(e) { console.log('[OF] failed:', e.message); }
+
+  const now = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+  const liveMatches = Object.values(SCORES).filter(s => isLive(s.status));
+  if (liveMatches.length > 0) {
+    document.getElementById('rinfo').textContent = `🔴 ${liveMatches.length} LIVE match${liveMatches.length>1?'es':''} — ${now} IST`;
+  } else {
+    document.getElementById('rinfo').textContent = `✅ ${ftCnt} result(s) — ${now} IST`;
   }
+  if (document.getElementById('stinfo'))
+    document.getElementById('stinfo').textContent = `Updated: ${now} IST`;
+
   resolveKOTeams(); gsR(); renderStd(); koR();
 }
 
@@ -748,7 +822,12 @@ doFetch().then(() => {
   autoSelectToday();
   scrollToLive();
 });
-function autoRefresh(){setTimeout(()=>{doFetch().then(autoRefresh);},60000);}
+function autoRefresh(){
+  // Refresh every 30s if there's a live match, 60s otherwise
+  const hasLive = Object.values(SCORES).some(s => isLive(s.status));
+  const delay = hasLive ? 30000 : 60000;
+  setTimeout(()=>{ doFetch().then(()=>{ scrollToLive(); autoRefresh(); }); }, delay);
+}
 autoRefresh();
 
 // PWA
