@@ -666,7 +666,88 @@ async function doFetch(){
 
 // INIT
 buildGS(); resolveKOTeams(); gsR(); buildKO(); koR(); renderGrp(); renderStd();
-doFetch();
+
+// ── AUTO-SELECT TODAY'S DATE ──
+function autoSelectToday() {
+  // Get current date in IST (UTC+5:30)
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(now.getTime() + istOffset + now.getTimezoneOffset() * 60000);
+  
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const todayKey = istDate.getDate() + ' ' + months[istDate.getMonth()];
+  
+  // Check if today has group stage matches
+  const todayGM = GM.filter(m => m.k === todayKey);
+  const todayKM = KM.filter(m => m.k === todayKey);
+  
+  if (todayGM.length > 0) {
+    // Today has group stage matches — select that date
+    gsd = todayKey;
+    const pill = [...document.querySelectorAll('#df .dpill')]
+      .find(p => p.textContent.trim() === todayKey);
+    if (pill) {
+      document.querySelectorAll('#df .dpill').forEach(p => p.classList.remove('on'));
+      pill.classList.add('on');
+      pill.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+    }
+    gsR();
+  } else if (todayKM.length > 0) {
+    // Today has knockout matches — switch to knockout tab
+    const koBtn = document.querySelector('.tb:nth-child(3)');
+    if (koBtn) showTab('ko', koBtn);
+    kod = todayKey;
+    const kpill = [...document.querySelectorAll('#kdf .dpill')]
+      .find(p => p.textContent.trim() === todayKey);
+    if (kpill) {
+      document.querySelectorAll('#kdf .dpill').forEach(p => p.classList.remove('on'));
+      kpill.classList.add('on');
+      kpill.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+    }
+    koR();
+  } else {
+    // No matches today — find next upcoming date
+    const allDates = [...new Set([...GM, ...KM].map(m => m.k))];
+    // Find first date after today
+    const nextDate = allDates.find(dk => {
+      const parts = dk.split(' ');
+      const d = parseInt(parts[0]);
+      const mIdx = months.indexOf(parts[1]);
+      const matchDate = new Date(2026, mIdx, d);
+      const todayDate = new Date(istDate.getFullYear(), istDate.getMonth(), istDate.getDate());
+      return matchDate >= todayDate;
+    });
+    if (nextDate) {
+      const hasGM = GM.some(m => m.k === nextDate);
+      if (hasGM) {
+        gsd = nextDate;
+        const pill = [...document.querySelectorAll('#df .dpill')]
+          .find(p => p.textContent.trim() === nextDate);
+        if (pill) {
+          document.querySelectorAll('#df .dpill').forEach(p => p.classList.remove('on'));
+          pill.classList.add('on');
+          pill.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+        }
+        gsR();
+      }
+    }
+  }
+}
+
+// ── SCROLL TO LIVE MATCH ──
+function scrollToLive() {
+  setTimeout(() => {
+    const liveBadge = document.querySelector('.lbadge');
+    if (liveBadge) {
+      liveBadge.closest('.mc')?.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }, 500);
+}
+
+doFetch().then(() => {
+  autoSelectToday();
+  scrollToLive();
+});
 function autoRefresh(){setTimeout(()=>{doFetch().then(autoRefresh);},60000);}
 autoRefresh();
 
