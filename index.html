@@ -715,8 +715,10 @@ function resolveKOTeams(){
   // Two passes: first resolve what we can, second pass gets W/L from resolved matches
   for(let pass=0;pass<2;pass++){
     KM.forEach(m=>{
-      m.t1 = resolveKOSlot(m.s1, qual, mres);
-      m.t2 = resolveKOSlot(m.s2, qual, mres);
+      // Only overwrite if currently TBD or a placeholder (don't overwrite real team names)
+      const isPlaceholder = s => !s || s==='TBD' || s.startsWith('W:') || s.startsWith('Winner') || s.startsWith('Loser') || s.startsWith('Group') || s.startsWith('🏅');
+      if(isPlaceholder(m.t1)) m.t1 = resolveKOSlot(m.s1, qual, mres);
+      if(isPlaceholder(m.t2)) m.t2 = resolveKOSlot(m.s2, qual, mres);
       // Check if this match has a result in SCORES
       if(m.mn && m.t1!=='TBD' && m.t2!=='TBD'){
         const clean = s => s.replace(/[^\w ]/g,'').trim();
