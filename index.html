@@ -485,7 +485,23 @@ const EVENTS = {
 
 // ── HELPERS ──
 function mk(a,b){return[a,b].sort().join('|||');}
-function gsc(m){return m.h1?SCORES[mk(m.h1,m.h2)]||null:null;}
+function stripName(s){
+  // Remove emoji flags + trim to get plain team name
+  return (s||'').replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]/gu,'')
+                .replace(/[^\x00-\x7F]/g,'').trim();
+}
+// Name fixes for API vs display mismatches
+const NAME_FIX={'Bosnia & Herz.':'Bosnia & Herzegovina','Türkiye':'Turkey','Czechia':'Czech Republic','Curaçao':'Curaçao'};
+function apiName(s){ const n=stripName(s); return NAME_FIX[n]||n; }
+function gsc(m){
+  // Group stage: use exact h1/h2 API names
+  if(m.h1&&m.h2) return SCORES[mk(m.h1,m.h2)]||null;
+  // Knockout: strip emoji from t1/t2 and look up
+  if(m.t1&&m.t1!=='TBD'&&m.t2&&m.t2!=='TBD'){
+    return SCORES[mk(apiName(m.t1),apiName(m.t2))]||null;
+  }
+  return null;
+}
 function gev(m){return m.h1?EVENTS[mk(m.h1,m.h2)]||null:null;}
 function isLive(s){return s&&['1H','2H','HT','ET','LIVE'].includes(String(s).toUpperCase());}
 function isFT(s){return s&&['FT','AET','FINISHED'].includes(String(s).toUpperCase());}
