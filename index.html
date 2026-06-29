@@ -502,7 +502,15 @@ function gsc(m){
   }
   return null;
 }
-function gev(m){return m.h1?EVENTS[mk(m.h1,m.h2)]||null:null;}
+function gev(m){
+  // Group stage: use exact h1/h2 API names
+  if(m.h1&&m.h2) return EVENTS[mk(m.h1,m.h2)]||null;
+  // Knockout: strip emoji from t1/t2
+  if(m.t1&&m.t1!=='TBD'&&m.t2&&m.t2!=='TBD'){
+    return EVENTS[mk(apiName(m.t1),apiName(m.t2))]||null;
+  }
+  return null;
+}
 function isLive(s){return s&&['1H','2H','HT','ET','LIVE'].includes(String(s).toUpperCase());}
 function isFT(s){return s&&['FT','AET','FINISHED'].includes(String(s).toUpperCase());}
 function tc(i){
