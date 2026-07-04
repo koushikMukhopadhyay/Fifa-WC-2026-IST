@@ -532,7 +532,8 @@ function gsc(m){
   if(m.h1&&m.h2) return SCORES[mk(m.h1,m.h2)]||null;
   // Knockout: strip emoji from t1/t2 and look up
   if(m.t1&&m.t1!=='TBD'&&m.t2&&m.t2!=='TBD'){
-    return SCORES[mk(apiName(m.t1),apiName(m.t2))]||null;
+    const n1=apiName(m.t1), n2=apiName(m.t2);
+    return SCORES[mk(n1,n2)] || SCORES[mk(m.t1,m.t2)] || null;
   }
   return null;
 }
@@ -541,7 +542,8 @@ function gev(m){
   if(m.h1&&m.h2) return EVENTS[mk(m.h1,m.h2)]||null;
   // Knockout: strip emoji from t1/t2
   if(m.t1&&m.t1!=='TBD'&&m.t2&&m.t2!=='TBD'){
-    return EVENTS[mk(apiName(m.t1),apiName(m.t2))]||null;
+    const n1=apiName(m.t1), n2=apiName(m.t2);
+    return EVENTS[mk(n1,n2)] || EVENTS[mk(m.t1,m.t2)] || null;
   }
   return null;
 }
@@ -795,8 +797,7 @@ function resolveKOTeams(){
       if(isPlaceholder(m.t2)) m.t2 = resolveKOSlot(m.s2, qual, mres);
       // Check if this match has a result in SCORES
       if(m.mn && m.t1!=='TBD' && m.t2!=='TBD'){
-        const clean = s => s.replace(/[^\w ]/g,'').trim();
-        const k = mk(clean(m.t1), clean(m.t2));
+        const k = mk(apiName(m.t1), apiName(m.t2));  // use apiName to handle Bosnia & Herz. etc.
         const sc = SCORES[k];
         if(sc && isFT(sc.status)){
           let winner, loser;
@@ -955,7 +956,7 @@ async function doFetch() {
   if (document.getElementById('stinfo'))
     document.getElementById('stinfo').textContent = `Updated: ${now} IST`;
 
-  resolveKOTeams(); gsR(); renderStd(); koR();
+  resolveKOTeams(); resolveKOTeams(); gsR(); renderStd(); koR(); // double pass for chained resolution
 }
 
 // INIT
