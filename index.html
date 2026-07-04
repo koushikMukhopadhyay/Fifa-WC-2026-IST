@@ -406,6 +406,23 @@ const SCORES = {
   'Croatia|||Panama':{hs:0,as:1,status:'FT',minute:null},
   'England|||Panama':{hs:0,as:2,status:'FT',minute:null},
   'Croatia|||Ghana':{hs:2,as:1,status:'FT',minute:null},
+  // ── ROUND OF 32 RESULTS ──
+'Canada|||South Africa':{hs:0,as:1,status:'FT',minute:null},
+  'Germany|||Paraguay':{hs:1,as:1,status:'PEN',pen:[3,4],et:[1,1],minute:null},
+  'Morocco|||Netherlands':{hs:1,as:1,status:'PEN',pen:[2,3],et:[1,1],minute:null},
+  'Brazil|||Japan':{hs:2,as:1,status:'FT',minute:null},
+  'France|||Sweden':{hs:3,as:0,status:'FT',minute:null},
+  'Ivory Coast|||Norway':{hs:1,as:2,status:'FT',minute:null},
+  'Ecuador|||Mexico':{hs:2,as:0,status:'FT',minute:null},
+  'DR Congo|||England':{hs:2,as:1,status:'FT',minute:null},
+  'Bosnia & Herzegovina|||USA':{hs:2,as:0,status:'FT',minute:null},
+  'Belgium|||Senegal':{hs:3,as:2,status:'AET',et:[3,2],minute:null},
+  'Croatia|||Portugal':{hs:2,as:1,status:'FT',minute:null},
+  'Austria|||Spain':{hs:3,as:0,status:'FT',minute:null},
+  'Algeria|||Switzerland':{hs:2,as:0,status:'FT',minute:null},
+  'Argentina|||Cape Verde':{hs:3,as:2,status:'AET',et:[3,2],minute:null},
+  'Colombia|||Ghana':{hs:1,as:0,status:'FT',minute:null},
+  'Australia|||Egypt':{hs:1,as:1,status:'PEN',pen:[2,4],et:[1,1],minute:null},
 };
 
 const EVENTS = {
@@ -481,6 +498,23 @@ const EVENTS = {
   'Croatia|||Panama':{ht:[0,0],t1:'Panama',t2:'Croatia',goals:[{min:'54',player:'Ante Budimir',team:'Croatia',side:2,pen:false,og:false}],cards:[]},
   'England|||Panama':{ht:[0,0],t1:'Panama',t2:'England',goals:[{min:'62',player:'Jude Bellingham',team:'England',side:2,pen:false,og:false},{min:'67',player:'Harry Kane',team:'England',side:2,pen:false,og:false}],cards:[]},
   'Croatia|||Ghana':{ht:[1,0],t1:'Croatia',t2:'Ghana',goals:[{min:'31',player:'Petar Sucic',team:'Croatia',side:1,pen:false,og:false},{min:'83',player:'Nikola Vlasic',team:'Croatia',side:1,pen:false,og:false},{min:'73',player:'Derrick Luckassen',team:'Ghana',side:2,pen:false,og:false}],cards:[]},
+  // ── ROUND OF 32 EVENTS ──
+'Canada|||South Africa':{ht:[0,0],t1:'South Africa',t2:'Canada',goals:[{min:'90+2',player:'Stephan Eustáquio',team:'Canada',side:2,pen:false,og:false}],cards:[],status:'FT'},
+  'Germany|||Paraguay':{ht:[0,1],t1:'Germany',t2:'Paraguay',goals:[{min:'54',player:'Kai Havertz',team:'Germany',side:1,pen:false,og:false},{min:'42',player:'Julio Enciso',team:'Paraguay',side:2,pen:false,og:false}],cards:[],status:'PEN',pen:[3,4]},
+  'Morocco|||Netherlands':{ht:[0,0],t1:'Netherlands',t2:'Morocco',goals:[{min:'72',player:'Cody Gakpo',team:'Netherlands',side:1,pen:false,og:false},{min:'90+1',player:'Issa Diop',team:'Morocco',side:2,pen:false,og:false}],cards:[],status:'PEN',pen:[2,3]},
+  'Brazil|||Japan':{ht:[0,1],t1:'Brazil',t2:'Japan',goals:[{min:'56',player:'Casemiro',team:'Brazil',side:1,pen:false,og:false},{min:'90+5',player:'Gabriel Martinelli',team:'Brazil',side:1,pen:false,og:false},{min:'29',player:'Kaishu Sano',team:'Japan',side:2,pen:false,og:false}],cards:[],status:'FT'},
+  'France|||Sweden':{ht:[1,0],t1:'France',t2:'Sweden',goals:[{min:'45',player:'Kylian Mbappé',team:'France',side:1,pen:false,og:false},{min:'74',player:'Kylian Mbappé',team:'France',side:1,pen:false,og:false},{min:'53',player:'Bradley Barcola',team:'France',side:1,pen:false,og:false}],cards:[],status:'FT'},
+  'Ivory Coast|||Norway':{ht:[0,1],t1:'Ivory Coast',t2:'Norway',goals:[{min:'74',player:'Amad Diallo',team:'Ivory Coast',side:1,pen:false,og:false},{min:'39',player:'Antonio Nusa',team:'Norway',side:2,pen:false,og:false},{min:'86',player:'Erling Haaland',team:'Norway',side:2,pen:false,og:false}],cards:[],status:'FT'},
+  'Ecuador|||Mexico':{ht:[1,0],t1:'Mexico',t2:'Ecuador',goals:[{min:'31',player:'Julián Quiñones',team:'Mexico',side:1,pen:false,og:false},{min:'45+1',player:'Raúl Jiménez',team:'Mexico',side:1,pen:false,og:false}],cards:[],status:'FT'},
+  'DR Congo|||England':{ht:[0,1],t1:'England',t2:'DR Congo',goals:[{min:'75',player:'Harry Kane',team:'England',side:1,pen:false,og:false},{min:'86',player:'Harry Kane',team:'England',side:1,pen:false,og:false},{min:'7',player:'Brian Cipenga',team:'DR Congo',side:2,pen:false,og:false}],cards:[],status:'FT'},
+  'Bosnia & Herzegovina|||USA':{ht:[1,0],t1:'USA',t2:'Bosnia & Herzegovina',goals:[{min:'45',player:'Folarin Balogun',team:'USA',side:1,pen:false,og:false},{min:'82',player:'Malik Tillman',team:'USA',side:1,pen:false,og:false}],cards:[],status:'FT'},
+  'Belgium|||Senegal':{ht:[0,1],t1:'Belgium',t2:'Senegal',goals:[{min:'86',player:'Romelu Lukaku',team:'Belgium',side:1,pen:false,og:false},{min:'89',player:'Youri Tielemans',team:'Belgium',side:1,pen:false,og:false},{min:'120+5',player:'Youri Tielemans',team:'Belgium',side:1,pen:true,og:false},{min:'25',player:'Habib Diarra',team:'Senegal',side:2,pen:false,og:false},{min:'51',player:'Ismaïla Sarr',team:'Senegal',side:2,pen:false,og:false}],cards:[],status:'AET'},
+  'Croatia|||Portugal':{ht:[0,0],t1:'Portugal',t2:'Croatia',goals:[{min:'68',player:'Cristiano Ronaldo',team:'Portugal',side:1,pen:true,og:false},{min:'90+4',player:'Gonçalo Ramos',team:'Portugal',side:1,pen:false,og:false},{min:'53',player:'Ivan Perisic',team:'Croatia',side:2,pen:false,og:false}],cards:[],status:'FT'},
+  'Austria|||Spain':{ht:[1,0],t1:'Spain',t2:'Austria',goals:[{min:'36',player:'Mikel Oyarzabal',team:'Spain',side:1,pen:false,og:false},{min:'89',player:'Mikel Oyarzabal',team:'Spain',side:1,pen:false,og:false},{min:'66',player:'Pedro Porro',team:'Spain',side:1,pen:false,og:false}],cards:[],status:'FT'},
+  'Algeria|||Switzerland':{ht:[1,0],t1:'Switzerland',t2:'Algeria',goals:[{min:'10',player:'Breel Embolo',team:'Switzerland',side:1,pen:false,og:false},{min:'46',player:'Dan Ndoye',team:'Switzerland',side:1,pen:false,og:false}],cards:[],status:'FT'},
+  'Argentina|||Cape Verde':{ht:[1,0],t1:'Argentina',t2:'Cape Verde',goals:[{min:'29',player:'Lionel Messi',team:'Argentina',side:1,pen:false,og:false},{min:'92',player:'Lisandro Martínez',team:'Argentina',side:1,pen:false,og:false},{min:'111',player:'Diney Borges',team:'Argentina',side:1,pen:false,og:true},{min:'59',player:'Deroy Duarte',team:'Cape Verde',side:2,pen:false,og:false},{min:'103',player:'Sidny Lopes Cabral',team:'Cape Verde',side:2,pen:false,og:false}],cards:[],status:'AET'},
+  'Colombia|||Ghana':{ht:[1,0],t1:'Colombia',t2:'Ghana',goals:[{min:'14',player:'Jhon Arias',team:'Colombia',side:1,pen:false,og:false}],cards:[],status:'FT'},
+  'Australia|||Egypt':{ht:[0,1],t1:'Australia',t2:'Egypt',goals:[{min:'55',player:'Mohamed Hany',team:'Australia',side:1,pen:false,og:true},{min:'13',player:'Emam Ashour',team:'Egypt',side:2,pen:false,og:false}],cards:[],status:'PEN',pen:[2,4]},
 };
 
 // ── HELPERS ──
@@ -512,7 +546,7 @@ function gev(m){
   return null;
 }
 function isLive(s){return s&&['1H','2H','HT','ET','LIVE'].includes(String(s).toUpperCase());}
-function isFT(s){return s&&['FT','AET','FINISHED'].includes(String(s).toUpperCase());}
+function isFT(s){return s&&['FT','AET','PEN','FINISHED','PEN_DONE'].includes(String(s).toUpperCase());}
 function tc(i){
   if(i.includes("9:30 PM")||i.includes("10:30 PM")||i.includes("11:30 PM"))return"#22c55e";
   if(i.includes("12:30 AM"))return"#facc15";
@@ -532,12 +566,22 @@ function openM(src,idx){
   document.getElementById('mt1').textContent=m.t1;
   document.getElementById('mt2').textContent=m.t2;
   const sel=document.getElementById('mscore');
-  sel.textContent=sc?`${sc.hs}–${sc.as}`:'VS';
+  if(sc){
+    let sd = `${sc.hs}–${sc.as}`;
+    if(sc.status==='PEN'&&sc.pen) sd += ` (P:${sc.pen[0]}-${sc.pen[1]})`;
+    else if(sc.status==='AET') sd += ' AET';
+    sel.textContent = sd;
+  } else { sel.textContent='VS'; }
   sel.className='mbscore '+(live?'live':ft?'ft':'pre');
 
   let meta=`<span class="mchip">📅 ${m.d}</span><span class="mchip">🕐 ${m.i}</span><span class="mchip">📍 ${m.v}</span>`;
   if(live&&sc.minute)meta+=`<span class="mchip" style="color:#f87171;font-weight:bold">🔴 ${sc.minute}'</span>`;
-  if(ft)meta+=`<span class="mchip" style="color:#22c55e">✅ Full Time</span>`;
+  if(ft){
+    let ftLabel = sc.status==='PEN' ? `✅ Won on Penalties (${sc.pen?sc.pen[0]+'-'+sc.pen[1]:''})` 
+                : sc.status==='AET' ? '✅ Won in Extra Time'
+                : '✅ Full Time';
+    meta+=`<span class="mchip" style="color:#22c55e">${ftLabel}</span>`;
+  }
   if(ev&&ev.ht)meta+=`<span class="mchip">HT: ${ev.ht[0]}–${ev.ht[1]}</span>`;
   document.getElementById('mmeta').innerHTML=meta;
 
@@ -581,7 +625,13 @@ function card(m, src, idx){
   const sc=gsc(m);
   const live=sc&&isLive(sc.status), ft=sc&&isFT(sc.status);
   let mid=`<div class="vs">VS</div>`;
-  if(sc){const cls=live?'live':ft?'ft':'';mid=`<div class="sbox ${cls}">${sc.hs}–${sc.as}</div>`;}
+  if(sc){
+    const cls=live?'live':ft?'ft':'';
+    let scoreDisp = `${sc.hs}–${sc.as}`;
+    if(sc.status==='PEN'&&sc.pen) scoreDisp += ` (P:${sc.pen[0]}-${sc.pen[1]})`;
+    else if(sc.status==='AET') scoreDisp += ' AET';
+    mid=`<div class="sbox ${cls}" style="font-size:${sc.status==='PEN'?'11px':'16px'};min-width:${sc.status==='PEN'?'90px':'54px'}">${scoreDisp}</div>`;
+  }
   const minStr = sc?.minute ? ` ${sc.minute}'` : '';
   const stxt=live?`<span style="color:#f87171;font-size:12px;font-weight:900;font-family:Arial,sans-serif;letter-spacing:.5px">🔴 LIVE${minStr}</span>`
     :ft?`<span style="color:#22c55e;font-size:10px;font-family:Arial,sans-serif">✅ FT</span>`:'';
@@ -749,9 +799,15 @@ function resolveKOTeams(){
         const k = mk(clean(m.t1), clean(m.t2));
         const sc = SCORES[k];
         if(sc && isFT(sc.status)){
-          mres[m.mn] = {
-            w: sc.hs>sc.as ? m.t1 : m.t2,
-            l: sc.hs>sc.as ? m.t2 : m.t1
+          let winner, loser;
+          if(sc.status==='PEN' && sc.pen){
+            winner = sc.pen[0]>sc.pen[1] ? m.t1 : m.t2;
+            loser  = sc.pen[0]>sc.pen[1] ? m.t2 : m.t1;
+          } else {
+            winner = sc.hs>sc.as ? m.t1 : m.t2;
+            loser  = sc.hs>sc.as ? m.t2 : m.t1;
+          }
+          mres[m.mn] = { w: winner, l: loser
           };
         }
       }
