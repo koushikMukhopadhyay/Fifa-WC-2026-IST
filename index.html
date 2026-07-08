@@ -653,8 +653,11 @@ function card(m, src, idx){
     mid=`<div class="sbox ${cls}" style="font-size:${sc.status==='PEN'?'11px':'16px'};min-width:${sc.status==='PEN'?'90px':'54px'}">${scoreDisp}</div>`;
   }
   const minStr = sc?.minute ? ` ${sc.minute}'` : '';
+  let ftLabel = '✅ FT';
+  if(sc && sc.status==='PEN' && sc.pen) ftLabel = '✅ FT (P:'+sc.pen[0]+'-'+sc.pen[1]+')';
+  else if(sc && sc.status==='AET') ftLabel = '✅ AET';
   const stxt=live?`<span style="color:#f87171;font-size:12px;font-weight:900;font-family:Arial,sans-serif;letter-spacing:.5px">🔴 LIVE${minStr}</span>`
-    :ft?`<span style="color:#22c55e;font-size:10px;font-family:Arial,sans-serif">✅ FT</span>`:'';
+    :ft?`<span style="color:#22c55e;font-size:10px;font-family:Arial,sans-serif">${ftLabel}</span>`:'';
   const hint=ft?`<div class="hint">⚽ Tap for goal scorers & details</div>`:(!sc?`<div class="hint">Tap for match info</div>`:'');
   return `<div class="mc" onclick="openM('${src}',${idx})" style="background:linear-gradient(135deg,${BG[m.s]||'#0f1e35'} 0%,#0f172a 100%);border:1px solid ${live?'#dc2626':gc+'33'}">
     <div class="acc" style="background:${live?'#dc2626':gc}"></div>
@@ -927,27 +930,51 @@ async function fetchOpenFootball() {
   let cnt = 0;
   (data.matches || []).forEach(m => {
     const k = mk(m.team1, m.team2);
-    if (m.score?.ft) {
-      // Don't overwrite a live score with FT if ESPN said it's live
-      const existing = SCORES[k];
-      if (!existing || existing.status !== 'LIVE') {
-        SCORES[k] = { hs: m.score.ft[0], as: m.score.ft[1], status:'FT', minute:null };
-      }
-      const goals = [
-        ...(m.goals1||[]).map(g=>({min:g.minute,player:g.name,team:m.team1,side:1,pen:!!g.penalty,og:!!g.owngoal})),
-        ...(m.goals2||[]).map(g=>({min:g.minute,player:g.name,team:m.team2,side:2,pen:!!g.penalty,og:!!g.owngoal}))
-      ];
-      EVENTS[k] = { ht: m.score.ht||null, t1:m.team1, t2:m.team2, goals, cards:[] };
-      cnt++;
-    } else if (m.score?.ht) {
-      if (!SCORES[k] || SCORES[k].status === 'SCH') {
-        SCORES[k] = { hs: m.score.ht[0], as: m.score.ht[1], status:'HT', minute:45 };
-        cnt++;
-      }
+    const msc = m.score || {};
+    const ft  = msc.ft;
+    const et  = msc.et;
+    const p   = msc.p;
+    const ht  = msc.ht;
+
+    if (!ft && !et && !p) return; // no result yet
+
+    // Determine result correctly (FT / AET / PEN)
+    let hs, as_, status, penArr = null;
+    if (p) {
+      // Penalty shootout: use FT score as the base, penalty as tiebreaker
+      hs  = ft ? ft[0] : (et ? et[0] : 0);
+      as_ = ft ? ft[1] : (et ? et[1] : 0);
+      penArr = p;
+      status = 'PEN';
+    } else if (et) {
+      // Extra time, no penalties
+      hs = et[0]; as_ = et[1]; status = 'AET';
+    } else {
+      // Normal FT
+      hs = ft[0]; as_ = ft[1]; status = 'FT';
     }
+
+    const existing = SCORES[k];
+    // Only skip if currently LIVE (don't overwrite real-time live data)
+    if (!existing || existing.status !== 'LIVE') {
+      const entry = { hs, as: as_, status, minute: null };
+      if (penArr) entry.pen = penArr;
+      SCORES[k] = entry;
+    }
+
+    // Store goals and events
+    const goals = [
+      ...(m.goals1||[]).map(g=>({min:g.minute,player:g.name,team:m.team1,side:1,pen:!!g.penalty,og:!!g.owngoal})),
+      ...(m.goals2||[]).map(g=>({min:g.minute,player:g.name,team:m.team2,side:2,pen:!!g.penalty,og:!!g.owngoal}))
+    ];
+    const existing_ev = EVENTS[k];
+    // Always update events to get latest goal data
+    EVENTS[k] = { ht: ht||null, t1:m.team1, t2:m.team2, goals, cards:[], status };
+    cnt++;
   });
   return cnt;
 }
+
 
 async function doFetch() {
   document.getElementById('rinfo').textContent = '🔄 Fetching live scores...';
